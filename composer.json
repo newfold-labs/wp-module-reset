@@ -1,0 +1,69 @@
+{
+	"name": "newfold-labs/wp-module-reset",
+	"description": "Factory Reset module for Newfold WordPress plugins",
+	"type": "library",
+	"license": "GPL-2.0-or-later",
+	"repositories": {
+		"outlandishideas/wpackagist": {
+			"type": "composer",
+			"url": "https://wpackagist.org"
+		},
+		"0": {
+			"type": "composer",
+			"url": "https://newfold-labs.github.io/satis/",
+			"only": [
+				"newfold-labs/*"
+			]
+		}
+	},
+	"require": {
+		"newfold-labs/wp-module-features": "^1.5"
+	},
+	"require-dev": {
+		"newfold-labs/wp-php-standards": "^1.2.5",
+		"wp-cli/i18n-command": "^2.6.6",
+		"johnpbloch/wordpress": "@stable",
+		"lucatume/wp-browser": "*",
+		"phpunit/phpcov": "*",
+		"yoast/phpunit-polyfills": "^2.0.5"
+	},
+	"autoload": {
+		"psr-4": {
+			"NewfoldLabs\\WP\\Module\\Reset\\": "includes"
+		},
+		"files": [
+			"bootstrap.php"
+		]
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"composer/installers": true,
+			"johnpbloch/wordpress-core-installer": true
+		},
+		"platform": {
+			"php": "7.4"
+		}
+	},
+	"scripts": {
+		"test": [
+			"codecept run wpunit"
+		],
+		"test-coverage": [
+			"codecept run wpunit --coverage wpunit.cov",
+			"phpcov merge ./tests/_output/ --clover ./tests/_output/coverage.xml"
+		],
+		"lint": "vendor/bin/phpcs --standard=phpcs.xml -s .",
+		"fix": "vendor/bin/phpcbf --standard=phpcs.xml .",
+		"i18n-pot": "vendor/bin/wp i18n make-pot . ./languages/wp-module-reset.pot --domain=wp-module-reset --exclude=tests,vendor,node_modules",
+		"i18n-po": "vendor/bin/wp i18n update-po ./languages/wp-module-reset.pot ./languages",
+		"i18n-mo": "vendor/bin/wp i18n make-mo ./languages",
+		"i18n-php": "vendor/bin/wp i18n make-php ./languages",
+		"i18n": [
+			"@i18n-pot",
+			"@i18n-po",
+			"@i18n-mo",
+			"@i18n-php"
+		]
+	}
+}

@@ -1,0 +1,9 @@
+/vendor/
+/composer.lock
+/node_modules/
+/wordpress/
+/tests/_output/*
+!/tests/_output/.gitkeep
+/tests/_support/_generated/
+.env.testing
+codeception.yml

@@ -1,0 +1,10 @@
+<ruleset name="wp-module-reset">
+	<rule ref="Newfold"/>
+	<config name="testVersion" value="7.3-"/>
+	<config name="minimum_supported_wp_version" value="6.6"/>
+	<arg name="cache" value=".cache/phpcs.json"/>
+	<exclude-pattern>/vendor</exclude-pattern>
+	<exclude-pattern>/node_modules</exclude-pattern>
+	<exclude-pattern>/tests</exclude-pattern>
+	<exclude-pattern>/languages</exclude-pattern>
+</ruleset>
