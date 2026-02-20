@@ -390,7 +390,6 @@ class ToolsPage {
 							?>
 						</li>
 						<li><?php esc_html_e( 'Delete all uploaded media files', 'wp-module-reset' ); ?></li>
-						<li><?php esc_html_e( 'Remove all MU plugins and drop-in files', 'wp-module-reset' ); ?></li>
 						<li><?php esc_html_e( 'Destroy any staging sites', 'wp-module-reset' ); ?></li>
 					</ul>
 					<p class="nfd-reset-preserved"><?php esc_html_e( 'Your admin account and site URL will be preserved.', 'wp-module-reset' ); ?></p>
@@ -662,12 +661,20 @@ class ToolsPage {
 
 					<div class="nfd-reset-cta-group">
 						<a href="<?php echo esc_url( admin_url( 'index.php?page=nfd-onboarding' ) ); ?>" class="nfd-reset-cta-primary">
-							<?php esc_html_e( 'Setup my site', 'wp-module-reset' ); ?>
+							<?php esc_html_e( 'Set up my site', 'wp-module-reset' ); ?>
 						</a>
 						<a href="<?php echo esc_url( $redirect_url ); ?>" class="nfd-reset-cta-secondary">
 							<?php esc_html_e( 'Exit to dashboard', 'wp-module-reset' ); ?>
 						</a>
 					</div>
+
+					<style>
+						#wpadminbar,
+						#adminmenumain,
+						#wpfooter { display: none !important; }
+						#wpcontent { margin-left: 0 !important; }
+						html.wp-toolbar { padding-top: 0 !important; }
+					</style>
 				<?php endif; ?>
 			</div>
 		</div>
