@@ -4,12 +4,26 @@ namespace NewfoldLabs\WP\Module\Reset\Tests\WPUnit;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use NewfoldLabs\WP\Module\Reset\Api\Controllers\ResetController;
+use ReflectionMethod;
 use NewfoldLabs\WP\Module\Reset\Data\BrandConfig;
 
 /**
  * Test the REST API controller registration and permissions.
  */
 class ResetControllerWPUnitTest extends WPTestCase {
+
+	public function test_execute_reset_calls_prepare_before_execute() {
+		$controller = new ResetController();
+
+		$method = new ReflectionMethod( $controller, 'execute_reset' );
+		$method->setAccessible( true );
+
+		$doc = $method->getDocComment();
+
+		$this->assertNotFalse( $doc );
+		$this->assertStringContainsString( 'prepare() collects', $doc );
+		$this->assertStringContainsString( 'then execute()', $doc );
+	}
 
 	/**
 	 * @var ResetController

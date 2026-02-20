@@ -3,6 +3,7 @@
 namespace NewfoldLabs\WP\Module\Reset\Tests\WPUnit;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
+use NewfoldLabs\WP\Module\Reset\Services\ResetDataPreserver;
 use NewfoldLabs\WP\Module\Reset\Services\ResetService;
 use NewfoldLabs\WP\Module\Reset\Data\BrandConfig;
 
@@ -166,6 +167,23 @@ class HiivePreservationWPUnitTest extends WPTestCase {
 		$this->call_restore_nfd_data( $data );
 
 		$this->assertSame( '4.13.1', get_option( $version_key ) );
+	}
+
+	public function test_restore_nfd_data_uses_data_preserver() {
+		$data = array(
+			'nfd_data_token'                       => 'tok_123',
+			'nfd_data_module_version'              => '1.2.3',
+			'nfd_data_connection_attempts'         => 5,
+			'nfd_data_connection_throttle'         => 'throttle',
+			'nfd_data_connection_throttle_timeout' => time() + 60,
+			'brand_plugin_version_option'          => 'brand_plugin_version',
+			'brand_plugin_version'                 => '9.9.9',
+		);
+
+		$result = ResetDataPreserver::restore_nfd_data( $data );
+
+		$this->assertTrue( $result['success'] );
+		$this->assertSame( 'tok_123', get_option( 'nfd_data_token' ) );
 	}
 
 	// ------------------------------------------------------------------

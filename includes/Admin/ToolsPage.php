@@ -66,9 +66,7 @@ class ToolsPage {
 	 * - Phase 2 (GET):  Execute destructive reset in a clean environment.
 	 */
 	public function handle_submission() {
-		// Only process on our page.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ! isset( $_GET['page'] ) || self::get_slug() !== $_GET['page'] ) {
+		if ( ! $this->is_reset_page_request() ) {
 			return;
 		}
 
@@ -96,8 +94,7 @@ class ToolsPage {
 	 * which third-party plugins hook into — and those hooks can fatal.
 	 */
 	private function handle_phase1() {
-		// Verify nonce.
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ), self::NONCE_ACTION ) ) {
+		if ( ! $this->verify_nonce() ) {
 			wp_die(
 				esc_html__( 'Security check failed. Please try again.', 'wp-module-reset' ),
 				esc_html__( 'Error', 'wp-module-reset' ),
@@ -105,8 +102,7 @@ class ToolsPage {
 			);
 		}
 
-		// Verify capability.
-		if ( ! Permissions::is_admin() ) {
+		if ( ! $this->current_user_can_reset() ) {
 			wp_die(
 				esc_html__( 'You do not have permission to perform this action.', 'wp-module-reset' ),
 				esc_html__( 'Error', 'wp-module-reset' ),
@@ -114,12 +110,11 @@ class ToolsPage {
 			);
 		}
 
-		// Verify URL confirmation.
-		$confirmation_url = isset( $_POST['confirmation_url'] ) ? sanitize_text_field( wp_unslash( $_POST['confirmation_url'] ) ) : '';
-		$expected_url     = untrailingslashit( home_url() );
-		$submitted_url    = untrailingslashit( $confirmation_url );
+		$confirmation_valid = $this->is_confirmation_url_valid(
+			isset( $_POST['confirmation_url'] ) ? sanitize_text_field( wp_unslash( $_POST['confirmation_url'] ) ) : ''
+		);
 
-		if ( $expected_url !== $submitted_url ) {
+		if ( ! $confirmation_valid ) {
 			set_transient( 'nfd_reset_error', __( 'The URL you entered does not match your website URL. Please try again.', 'wp-module-reset' ), 60 );
 			return;
 		}
@@ -166,8 +161,7 @@ class ToolsPage {
 	 * No third-party hooks, autoloaders, or shutdown handlers can interfere.
 	 */
 	private function handle_phase2() {
-		// Verify capability.
-		if ( ! Permissions::is_admin() ) {
+		if ( ! $this->current_user_can_reset() ) {
 			wp_die(
 				esc_html__( 'You do not have permission to perform this action.', 'wp-module-reset' ),
 				esc_html__( 'Error', 'wp-module-reset' ),
@@ -199,6 +193,55 @@ class ToolsPage {
 		// Safe to use wp_safe_redirect here — no third-party plugins are loaded.
 		wp_safe_redirect( admin_url( 'admin.php?page=' . self::get_slug() . '&reset_complete=1' ) );
 		exit;
+	}
+
+	/**
+	 * Determine whether the current request targets the reset tools page.
+	 *
+	 * @return bool
+	 */
+	private function is_reset_page_request() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return isset( $_GET['page'] ) && self::get_slug() === $_GET['page'];
+	}
+
+	/**
+	 * Verify the reset nonce from the request.
+	 *
+	 * @return bool
+	 */
+	private function verify_nonce() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! isset( $_POST[ self::NONCE_NAME ] ) ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$raw_nonce = wp_unslash( $_POST[ self::NONCE_NAME ] );
+
+		return wp_verify_nonce( sanitize_text_field( $raw_nonce ), self::NONCE_ACTION );
+	}
+
+	/**
+	 * Check whether the current user is allowed to run a factory reset.
+	 *
+	 * @return bool
+	 */
+	private function current_user_can_reset() {
+		return Permissions::is_admin();
+	}
+
+	/**
+	 * Validate the user-provided confirmation URL against the site URL.
+	 *
+	 * @param string $confirmation_url Raw URL provided by the user.
+	 * @return bool
+	 */
+	private function is_confirmation_url_valid( $confirmation_url ) {
+		$expected_url  = untrailingslashit( home_url() );
+		$submitted_url = untrailingslashit( $confirmation_url );
+
+		return $expected_url === $submitted_url;
 	}
 
 	/**
@@ -390,7 +433,6 @@ class ToolsPage {
 							?>
 						</li>
 						<li><?php esc_html_e( 'Delete all uploaded media files', 'wp-module-reset' ); ?></li>
-						<li><?php esc_html_e( 'Remove all MU plugins and drop-in files', 'wp-module-reset' ); ?></li>
 						<li><?php esc_html_e( 'Destroy any staging sites', 'wp-module-reset' ); ?></li>
 					</ul>
 					<p class="nfd-reset-preserved"><?php esc_html_e( 'Your admin account and site URL will be preserved.', 'wp-module-reset' ); ?></p>
@@ -465,7 +507,22 @@ class ToolsPage {
 		$steps        = ! empty( $result['steps'] ) ? $result['steps'] : array();
 		$errors       = ! empty( $result['errors'] ) ? $result['errors'] : array();
 		$has_errors   = ! empty( $errors );
+		$hide_chrome  = $success && ! $has_errors;
 		?>
+		<?php if ( $hide_chrome ) : ?>
+		<style type="text/css">
+			/* Hide admin bar, sidebar, and footer so user focuses on the two CTAs. */
+			#wpadminbar,
+			#adminmenumain,
+			#adminmenuwrap,
+			#wpfooter {
+				display: none !important;
+			}
+			#wpcontent {
+				margin-left: 0 !important;
+			}
+		</style>
+		<?php endif; ?>
 		<div class="wrap">
 			<style>
 				.nfd-reset-page {
@@ -662,7 +719,7 @@ class ToolsPage {
 
 					<div class="nfd-reset-cta-group">
 						<a href="<?php echo esc_url( admin_url( 'index.php?page=nfd-onboarding' ) ); ?>" class="nfd-reset-cta-primary">
-							<?php esc_html_e( 'Setup my site', 'wp-module-reset' ); ?>
+							<?php esc_html_e( 'Set up my site', 'wp-module-reset' ); ?>
 						</a>
 						<a href="<?php echo esc_url( $redirect_url ); ?>" class="nfd-reset-cta-secondary">
 							<?php esc_html_e( 'Exit to dashboard', 'wp-module-reset' ); ?>
