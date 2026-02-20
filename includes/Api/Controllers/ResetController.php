@@ -68,6 +68,11 @@ class ResetController extends \WP_REST_Controller {
 	/**
 	 * Execute the factory reset.
 	 *
+	 * Unlike the ToolsPage flow (which uses two HTTP requests with a redirect),
+	 * the REST API handles both phases in a single request: prepare() collects
+	 * the preservation data while all plugins are still loaded, then execute()
+	 * performs the destructive reset using that data.
+	 *
 	 * @param \WP_REST_Request $request The request object.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
@@ -84,7 +89,21 @@ class ResetController extends \WP_REST_Controller {
 			);
 		}
 
-		$result = ResetService::execute();
+		// Phase 1: Preserve critical data while all plugins are still loaded.
+		$preparation = ResetService::prepare();
+
+		if ( ! $preparation['success'] ) {
+			return new \WP_Error(
+				'reset_preparation_failed',
+				! empty( $preparation['errors'] )
+					? implode( ' ', $preparation['errors'] )
+					: __( 'Failed to prepare for reset.', 'wp-module-reset' ),
+				array( 'status' => 500 )
+			);
+		}
+
+		// Phase 2: Execute the destructive reset with preserved data.
+		$result = ResetService::execute( $preparation['data'], $preparation['steps'] );
 
 		if ( ! $result['success'] ) {
 			return new \WP_REST_Response( $result, 500 );
