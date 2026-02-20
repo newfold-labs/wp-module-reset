@@ -32,10 +32,10 @@ When a reset is executed, the following happens in order:
 7. Clean extra files/folders from `wp-content/` (except `plugins/`, `themes/`, `uploads/`, `mu-plugins/`, `index.php`)
 8. Empty the `wp-content/uploads/` directory (directory is preserved, contents deleted)
 9. Drop all database tables and run `wp_install()` to recreate core tables
-10. Restore preserved values (see below)
-11. Reinstall WordPress core files (fresh copy of the current version)
-12. Reinstall the brand default theme (fresh copy from WordPress.org)
-13. Restore Hiive/NFD connection data and enable coming soon mode
+10. Restore Hiive/NFD connection data and enable coming soon mode (runs before plugin activation so the token is available when activation hooks fire)
+11. Restore preserved values and activate brand plugin
+12. Reinstall WordPress core files (fresh copy of the current version)
+13. Reinstall the brand default theme (fresh copy from WordPress.org)
 14. Verify the site passes fresh-install detection
 15. Restore the admin session so the user stays logged in
 
@@ -54,6 +54,7 @@ The following values are saved before the reset and restored afterward:
 | `nfd_data_module_version` | Data module version for upgrade handler |
 | `nfd_data_connection_attempts` | Connection retry counter |
 | `nfd_data_connection_throttle` (transient) | Connection rate limiting |
+| `{brand}_plugin_version` | Brand plugin version — prevents upgrade routines from re-running |
 
 ### What Gets Deleted
 

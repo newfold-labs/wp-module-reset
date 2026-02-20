@@ -95,29 +95,37 @@ class ResetService {
 
 		$brand_basename = BrandConfig::get_brand_plugin_basename();
 
+		$brand_id             = BrandConfig::get_brand_id();
+		$brand_version_option = $brand_id . '_plugin_version';
+
 		$data = array(
-			'blogname'          => get_option( 'blogname' ),
-			'blog_public'       => get_option( 'blog_public' ),
-			'siteurl'           => get_option( 'siteurl' ),
-			'home'              => get_option( 'home' ),
-			'wplang'            => get_option( 'WPLANG' ),
-			'user_pass'         => $current_user->user_pass,
-			'user_login'        => $current_user->user_login,
-			'user_email'        => $current_user->user_email,
-			'brand_basename'    => $brand_basename,
+			'blogname'                             => get_option( 'blogname' ),
+			'blog_public'                          => get_option( 'blog_public' ),
+			'siteurl'                              => get_option( 'siteurl' ),
+			'home'                                 => get_option( 'home' ),
+			'wplang'                               => get_option( 'WPLANG' ),
+			'user_pass'                            => $current_user->user_pass,
+			'user_login'                           => $current_user->user_login,
+			'user_email'                           => $current_user->user_email,
+			'brand_basename'                       => $brand_basename,
 
 			// Hiive / NFD data options (preserved across reset).
 			'nfd_data_token'                       => get_option( 'nfd_data_token' ),
 			'nfd_data_module_version'              => get_option( 'nfd_data_module_version' ),
-			'nfd_data_connection_attempts'          => get_option( 'nfd_data_connection_attempts' ),
-			'nfd_data_connection_throttle'          => get_option( '_transient_nfd_data_connection_throttle' ),
-			'nfd_data_connection_throttle_timeout'  => get_option( '_transient_timeout_nfd_data_connection_throttle' ),
+			'nfd_data_connection_attempts'         => get_option( 'nfd_data_connection_attempts' ),
+			'nfd_data_connection_throttle'         => get_option( '_transient_nfd_data_connection_throttle' ),
+			'nfd_data_connection_throttle_timeout' => get_option( '_transient_timeout_nfd_data_connection_throttle' ),
+
+			// Brand plugin version (prevents upgrade handler from re-running
+			// all upgrade routines on the first post-reset page load).
+			'brand_plugin_version_option'          => $brand_version_option,
+			'brand_plugin_version'                 => get_option( $brand_version_option ),
 		);
 
 		// -------------------------------------------------------------------
 		// Install target theme (safety gate — abort if this fails).
 		// -------------------------------------------------------------------
-		$theme_result          = self::ensure_theme_installed( BrandConfig::get_default_theme_slug() );
+		$theme_result           = self::ensure_theme_installed( BrandConfig::get_default_theme_slug() );
 		$steps['install_theme'] = $theme_result;
 
 		if ( ! $theme_result['success'] ) {
@@ -231,6 +239,19 @@ class ResetService {
 		}
 
 		// -------------------------------------------------------------------
+		// Restore NFD data options and enable coming soon.
+		//
+		// This MUST run before restore_values() which calls activate_plugin().
+		// The token needs to be in the database before plugin activation hooks
+		// fire, otherwise the data module may attempt a fresh connect() and
+		// event listeners may send requests to Hiive without a valid token.
+		// -------------------------------------------------------------------
+		$steps['restore_nfd_data'] = self::run_step(
+			array( __CLASS__, 'restore_nfd_data' ),
+			$data
+		);
+
+		// -------------------------------------------------------------------
 		// Restore preserved values.
 		// -------------------------------------------------------------------
 		$steps['restore_values'] = self::run_step(
@@ -257,14 +278,6 @@ class ResetService {
 		);
 
 		// -------------------------------------------------------------------
-		// Restore NFD data options and enable coming soon.
-		// -------------------------------------------------------------------
-		$steps['restore_nfd_data'] = self::run_step(
-			array( __CLASS__, 'restore_nfd_data' ),
-			$data
-		);
-
-		// -------------------------------------------------------------------
 		// Verify fresh install state.
 		// -------------------------------------------------------------------
 		$steps['verify_fresh_install'] = self::run_step(
@@ -274,7 +287,7 @@ class ResetService {
 		// -------------------------------------------------------------------
 		// Restore session.
 		// -------------------------------------------------------------------
-		$user_id = isset( $steps['reset_database']['user_id'] )
+		$user_id                  = isset( $steps['reset_database']['user_id'] )
 			? $steps['reset_database']['user_id']
 			: 1;
 		$steps['restore_session'] = self::run_step(
@@ -928,6 +941,12 @@ class ResetService {
 				set_transient( 'nfd_data_connection_throttle', $data['nfd_data_connection_throttle'], $remaining );
 				$restored[] = 'nfd_data_connection_throttle';
 			}
+		}
+
+		// Restore brand plugin version (prevents upgrade handler re-run).
+		if ( ! empty( $data['brand_plugin_version_option'] ) && ! empty( $data['brand_plugin_version'] ) ) {
+			update_option( $data['brand_plugin_version_option'], $data['brand_plugin_version'] );
+			$restored[] = $data['brand_plugin_version_option'];
 		}
 
 		// Enable coming soon mode (required for onboarding to trigger).
