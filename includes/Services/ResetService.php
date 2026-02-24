@@ -93,34 +93,12 @@ class ResetService {
 			}
 		}
 
-		$brand_basename = BrandConfig::get_brand_plugin_basename();
+		// Capture all preserved values (including the brand plugin basename).
+		$data = ResetDataPreserver::capture( $current_user );
 
-		$brand_id             = BrandConfig::get_brand_id();
-		$brand_version_option = $brand_id . '_plugin_version';
-
-		$data = array(
-			'blogname'                             => get_option( 'blogname' ),
-			'blog_public'                          => get_option( 'blog_public' ),
-			'siteurl'                              => get_option( 'siteurl' ),
-			'home'                                 => get_option( 'home' ),
-			'wplang'                               => get_option( 'WPLANG' ),
-			'user_pass'                            => $current_user->user_pass,
-			'user_login'                           => $current_user->user_login,
-			'user_email'                           => $current_user->user_email,
-			'brand_basename'                       => $brand_basename,
-
-			// Hiive / NFD data options (preserved across reset).
-			'nfd_data_token'                       => get_option( 'nfd_data_token' ),
-			'nfd_data_module_version'              => get_option( 'nfd_data_module_version' ),
-			'nfd_data_connection_attempts'         => get_option( 'nfd_data_connection_attempts' ),
-			'nfd_data_connection_throttle'         => get_option( '_transient_nfd_data_connection_throttle' ),
-			'nfd_data_connection_throttle_timeout' => get_option( '_transient_timeout_nfd_data_connection_throttle' ),
-
-			// Brand plugin version (prevents upgrade handler from re-running
-			// all upgrade routines on the first post-reset page load).
-			'brand_plugin_version_option'          => $brand_version_option,
-			'brand_plugin_version'                 => get_option( $brand_version_option ),
-		);
+		// Brand plugin basename is required for Phase 1 step 2 (deactivate all
+		// plugins except the brand plugin at the DB level).
+		$brand_basename = isset( $data['brand_basename'] ) ? $data['brand_basename'] : BrandConfig::get_brand_plugin_basename();
 
 		// -------------------------------------------------------------------
 		// Install target theme (safety gate — abort if this fails).
@@ -202,7 +180,7 @@ class ResetService {
 		// -------------------------------------------------------------------
 		// Delete third-party plugin files.
 		// -------------------------------------------------------------------
-		$steps['remove_plugins'] = self::run_step(
+		$steps['remove_plugins'] = ResetStepRunner::run(
 			array( __CLASS__, 'remove_plugins' ),
 			$data['brand_basename']
 		);
@@ -210,22 +188,22 @@ class ResetService {
 		// -------------------------------------------------------------------
 		// Delete third-party themes.
 		// -------------------------------------------------------------------
-		$steps['remove_themes'] = self::run_step( array( __CLASS__, 'remove_themes' ) );
+		$steps['remove_themes'] = ResetStepRunner::run( array( __CLASS__, 'remove_themes' ) );
 
 		// -------------------------------------------------------------------
 		// Clean wp-content extras.
 		// -------------------------------------------------------------------
-		$steps['clean_wp_content'] = self::run_step( array( __CLASS__, 'clean_wp_content' ) );
+		$steps['clean_wp_content'] = ResetStepRunner::run( array( __CLASS__, 'clean_wp_content' ) );
 
 		// -------------------------------------------------------------------
 		// Clean uploads.
 		// -------------------------------------------------------------------
-		$steps['clean_uploads'] = self::run_step( array( __CLASS__, 'clean_uploads' ) );
+		$steps['clean_uploads'] = ResetStepRunner::run( array( __CLASS__, 'clean_uploads' ) );
 
 		// -------------------------------------------------------------------
 		// Reset database.
 		// -------------------------------------------------------------------
-		$steps['reset_database'] = self::run_step(
+		$steps['reset_database'] = ResetStepRunner::run(
 			array( __CLASS__, 'reset_database' ),
 			$data['blogname'],
 			$data['user_login'],
@@ -246,15 +224,12 @@ class ResetService {
 		// fire, otherwise the data module may attempt a fresh connect() and
 		// event listeners may send requests to Hiive without a valid token.
 		// -------------------------------------------------------------------
-		$steps['restore_nfd_data'] = self::run_step(
-			array( __CLASS__, 'restore_nfd_data' ),
-			$data
-		);
+		$steps['restore_nfd_data'] = ResetStepRunner::run( array( __CLASS__, 'restore_nfd_data' ), $data );
 
 		// -------------------------------------------------------------------
 		// Restore preserved values.
 		// -------------------------------------------------------------------
-		$steps['restore_values'] = self::run_step(
+		$steps['restore_values'] = ResetStepRunner::run(
 			array( __CLASS__, 'restore_values' ),
 			$steps['reset_database'],
 			$data['user_pass'],
@@ -266,21 +241,21 @@ class ResetService {
 		// -------------------------------------------------------------------
 		// Reinstall WordPress core (fresh copy of current version).
 		// -------------------------------------------------------------------
-		$steps['reinstall_core'] = self::run_step(
+		$steps['reinstall_core'] = ResetStepRunner::run(
 			array( __CLASS__, 'reinstall_core' )
 		);
 
 		// -------------------------------------------------------------------
 		// Reinstall default theme (fresh copy from WordPress.org).
 		// -------------------------------------------------------------------
-		$steps['reinstall_theme'] = self::run_step(
+		$steps['reinstall_theme'] = ResetStepRunner::run(
 			array( __CLASS__, 'reinstall_theme' )
 		);
 
 		// -------------------------------------------------------------------
 		// Verify fresh install state.
 		// -------------------------------------------------------------------
-		$steps['verify_fresh_install'] = self::run_step(
+		$steps['verify_fresh_install'] = ResetStepRunner::run(
 			array( __CLASS__, 'verify_fresh_install' )
 		);
 
@@ -290,7 +265,7 @@ class ResetService {
 		$user_id                  = isset( $steps['reset_database']['user_id'] )
 			? $steps['reset_database']['user_id']
 			: 1;
-		$steps['restore_session'] = self::run_step(
+		$steps['restore_session'] = ResetStepRunner::run(
 			array( __CLASS__, 'restore_session' ),
 			$user_id
 		);
@@ -318,24 +293,8 @@ class ResetService {
 	// Helpers
 	// =====================================================================
 
-	/**
-	 * Run a reset step wrapped in try-catch so one failure cannot abort the
-	 * entire reset process.
-	 *
-	 * @param callable $callback Step method.
-	 * @param mixed    ...$args  Arguments.
-	 * @return array Step result.
-	 */
-	private static function run_step( $callback, ...$args ) {
-		try {
-			return call_user_func_array( $callback, $args );
-		} catch ( \Throwable $e ) {
-			return array(
-				'success' => false,
-				'message' => 'Error: ' . $e->getMessage(),
-			);
-		}
-	}
+	// NOTE: Step execution is now handled by ResetStepRunner::run() so that
+	// all services share a single, well-documented execution helper.
 
 	/**
 	 * Harden the PHP environment as defense-in-depth.
@@ -458,7 +417,7 @@ class ResetService {
 	 * @param string $brand_basename The brand plugin basename to preserve.
 	 * @return array Step result.
 	 */
-	private static function remove_plugins( $brand_basename ) {
+	public static function remove_plugins( $brand_basename ) {
 		global $wp_filesystem;
 
 		if ( ! function_exists( 'get_plugins' ) ) {
@@ -525,7 +484,7 @@ class ResetService {
 	 *
 	 * @return array Step result.
 	 */
-	private static function remove_themes() {
+	public static function remove_themes() {
 		$default_theme = BrandConfig::get_default_theme_slug();
 		switch_theme( $default_theme );
 
@@ -651,7 +610,7 @@ class ResetService {
 	 *
 	 * @return array Step result.
 	 */
-	private static function clean_wp_content() {
+	public static function clean_wp_content() {
 		global $wp_filesystem;
 
 		$content_dir = defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : ABSPATH . 'wp-content';
@@ -688,7 +647,7 @@ class ResetService {
 	 *
 	 * @return array Step result.
 	 */
-	private static function clean_uploads() {
+	public static function clean_uploads() {
 		global $wp_filesystem;
 
 		$upload_dir = wp_get_upload_dir();
@@ -722,7 +681,7 @@ class ResetService {
 	 * @param string $wplang     Site language.
 	 * @return array Step result with user_id.
 	 */
-	private static function reset_database( $blogname, $user_login, $user_email, $blog_public, $wplang ) {
+	public static function reset_database( $blogname, $user_login, $user_email, $blog_public, $wplang ) {
 		global $wpdb;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -785,7 +744,7 @@ class ResetService {
 	 * @param string $brand_basename The brand plugin basename.
 	 * @return array Step result.
 	 */
-	private static function restore_values( $db_result, $old_user_pass, $siteurl, $home, $brand_basename ) {
+	public static function restore_values( $db_result, $old_user_pass, $siteurl, $home, $brand_basename ) {
 		global $wpdb;
 
 		if ( ! $db_result['success'] || empty( $db_result['user_id'] ) ) {
@@ -828,7 +787,7 @@ class ResetService {
 	 *
 	 * @return array Step result.
 	 */
-	private static function reinstall_core() {
+	public static function reinstall_core() {
 		if ( ! function_exists( 'wp_version_check' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/update.php';
 		}
@@ -878,7 +837,7 @@ class ResetService {
 	 *
 	 * @return array Step result.
 	 */
-	private static function reinstall_theme() {
+	public static function reinstall_theme() {
 		global $wp_filesystem;
 
 		$theme_slug = BrandConfig::get_default_theme_slug();
@@ -913,50 +872,9 @@ class ResetService {
 	 * @param array $data Preserved data from Phase 1.
 	 * @return array Step result.
 	 */
-	private static function restore_nfd_data( $data ) {
-		$restored = array();
-
-		// Restore Hiive auth token.
-		if ( ! empty( $data['nfd_data_token'] ) ) {
-			update_option( 'nfd_data_token', $data['nfd_data_token'] );
-			$restored[] = 'nfd_data_token';
-		}
-
-		// Restore module version (for upgrade handler).
-		if ( ! empty( $data['nfd_data_module_version'] ) ) {
-			update_option( 'nfd_data_module_version', $data['nfd_data_module_version'] );
-			$restored[] = 'nfd_data_module_version';
-		}
-
-		// Restore connection attempts counter.
-		if ( ! empty( $data['nfd_data_connection_attempts'] ) ) {
-			update_option( 'nfd_data_connection_attempts', $data['nfd_data_connection_attempts'] );
-			$restored[] = 'nfd_data_connection_attempts';
-		}
-
-		// Restore connection throttle transient.
-		if ( ! empty( $data['nfd_data_connection_throttle'] ) && ! empty( $data['nfd_data_connection_throttle_timeout'] ) ) {
-			$remaining = (int) $data['nfd_data_connection_throttle_timeout'] - time();
-			if ( $remaining > 0 ) {
-				set_transient( 'nfd_data_connection_throttle', $data['nfd_data_connection_throttle'], $remaining );
-				$restored[] = 'nfd_data_connection_throttle';
-			}
-		}
-
-		// Restore brand plugin version (prevents upgrade handler re-run).
-		if ( ! empty( $data['brand_plugin_version_option'] ) && ! empty( $data['brand_plugin_version'] ) ) {
-			update_option( $data['brand_plugin_version_option'], $data['brand_plugin_version'] );
-			$restored[] = $data['brand_plugin_version_option'];
-		}
-
-		// Enable coming soon mode (required for onboarding to trigger).
-		update_option( 'nfd_coming_soon', true );
-		$restored[] = 'nfd_coming_soon';
-
-		return array(
-			'success' => true,
-			'message' => 'Restored hosting connection data and token.',
-		);
+	public static function restore_nfd_data( $data ) {
+		// Delegated to ResetDataPreserver for clearer separation of concerns.
+		return ResetDataPreserver::restore_nfd_data( $data );
 	}
 
 	/**
@@ -965,7 +883,7 @@ class ResetService {
 	 * @param int $user_id The admin user ID.
 	 * @return array Step result.
 	 */
-	private static function restore_session( $user_id ) {
+	public static function restore_session( $user_id ) {
 		wp_clear_auth_cookie();
 		wp_set_auth_cookie( $user_id );
 
@@ -980,7 +898,7 @@ class ResetService {
 	 *
 	 * @return array Step result.
 	 */
-	private static function verify_fresh_install() {
+	public static function verify_fresh_install() {
 		$failures = array();
 
 		$oldest_post = get_posts(

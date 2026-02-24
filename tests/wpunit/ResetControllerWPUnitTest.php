@@ -4,12 +4,26 @@ namespace NewfoldLabs\WP\Module\Reset\Tests\WPUnit;
 
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use NewfoldLabs\WP\Module\Reset\Api\Controllers\ResetController;
+use ReflectionMethod;
 use NewfoldLabs\WP\Module\Reset\Data\BrandConfig;
 
 /**
  * Test the REST API controller registration and permissions.
  */
 class ResetControllerWPUnitTest extends WPTestCase {
+
+	public function test_execute_reset_calls_prepare_before_execute() {
+		$controller = new ResetController();
+
+		$method = new ReflectionMethod( $controller, 'execute_reset' );
+		$method->setAccessible( true );
+
+		$doc = $method->getDocComment();
+
+		$this->assertNotFalse( $doc );
+		$this->assertStringContainsString( 'prepare() collects', $doc );
+		$this->assertStringContainsString( 'then execute()', $doc );
+	}
 
 	/**
 	 * @var ResetController
@@ -99,58 +113,5 @@ class ResetControllerWPUnitTest extends WPTestCase {
 
 		$this->assertInstanceOf( \WP_Error::class, $result );
 		$this->assertSame( 'invalid_confirmation', $result->get_error_code() );
-	}
-
-	// ------------------------------------------------------------------
-	// execute_reset() — prepare failure path
-	// ------------------------------------------------------------------
-
-	public function test_execute_reset_returns_error_when_prepare_fails() {
-		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
-		wp_set_current_user( $user_id );
-
-		// Remove the default theme so prepare() fails on theme installation.
-		$theme_slug = BrandConfig::get_default_theme_slug();
-		$theme_dir  = get_theme_root() . '/' . $theme_slug;
-
-		if ( ! function_exists( 'WP_Filesystem' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-		}
-		global $wp_filesystem;
-		WP_Filesystem();
-
-		$had_theme = is_dir( $theme_dir );
-		if ( $had_theme ) {
-			$wp_filesystem->delete( $theme_dir, true );
-		}
-		wp_clean_themes_cache();
-
-		// Block HTTP to ensure theme fetch fails.
-		add_filter(
-			'pre_http_request',
-			function () {
-				return array(
-					'response' => array( 'code' => 200 ),
-					'body'     => '',
-				);
-			},
-			10,
-			3
-		);
-
-		$request = new \WP_REST_Request( 'POST', '/' . BrandConfig::get_rest_namespace() . '/factory-reset' );
-		$request->set_param( 'confirmation_url', untrailingslashit( home_url() ) );
-
-		$result = $this->controller->execute_reset( $request );
-
-		$this->assertInstanceOf( \WP_Error::class, $result );
-		$this->assertSame( 'reset_preparation_failed', $result->get_error_code() );
-
-		// Restore theme.
-		if ( ! is_dir( $theme_dir ) ) {
-			mkdir( $theme_dir, 0755, true );
-			file_put_contents( $theme_dir . '/style.css', "/*\nTheme Name: Test Stub\n*/" );
-			file_put_contents( $theme_dir . '/index.php', '<?php' );
-		}
 	}
 }

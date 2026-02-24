@@ -66,9 +66,7 @@ class ToolsPage {
 	 * - Phase 2 (GET):  Execute destructive reset in a clean environment.
 	 */
 	public function handle_submission() {
-		// Only process on our page.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ! isset( $_GET['page'] ) || self::get_slug() !== $_GET['page'] ) {
+		if ( ! $this->is_reset_page_request() ) {
 			return;
 		}
 
@@ -96,8 +94,7 @@ class ToolsPage {
 	 * which third-party plugins hook into — and those hooks can fatal.
 	 */
 	private function handle_phase1() {
-		// Verify nonce.
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ), self::NONCE_ACTION ) ) {
+		if ( ! $this->verify_nonce() ) {
 			wp_die(
 				esc_html__( 'Security check failed. Please try again.', 'wp-module-reset' ),
 				esc_html__( 'Error', 'wp-module-reset' ),
@@ -105,8 +102,7 @@ class ToolsPage {
 			);
 		}
 
-		// Verify capability.
-		if ( ! Permissions::is_admin() ) {
+		if ( ! $this->current_user_can_reset() ) {
 			wp_die(
 				esc_html__( 'You do not have permission to perform this action.', 'wp-module-reset' ),
 				esc_html__( 'Error', 'wp-module-reset' ),
@@ -114,12 +110,11 @@ class ToolsPage {
 			);
 		}
 
-		// Verify URL confirmation.
-		$confirmation_url = isset( $_POST['confirmation_url'] ) ? sanitize_text_field( wp_unslash( $_POST['confirmation_url'] ) ) : '';
-		$expected_url     = untrailingslashit( home_url() );
-		$submitted_url    = untrailingslashit( $confirmation_url );
+		$confirmation_valid = $this->is_confirmation_url_valid(
+			isset( $_POST['confirmation_url'] ) ? sanitize_text_field( wp_unslash( $_POST['confirmation_url'] ) ) : ''
+		);
 
-		if ( $expected_url !== $submitted_url ) {
+		if ( ! $confirmation_valid ) {
 			set_transient( 'nfd_reset_error', __( 'The URL you entered does not match your website URL. Please try again.', 'wp-module-reset' ), 60 );
 			return;
 		}
@@ -166,8 +161,7 @@ class ToolsPage {
 	 * No third-party hooks, autoloaders, or shutdown handlers can interfere.
 	 */
 	private function handle_phase2() {
-		// Verify capability.
-		if ( ! Permissions::is_admin() ) {
+		if ( ! $this->current_user_can_reset() ) {
 			wp_die(
 				esc_html__( 'You do not have permission to perform this action.', 'wp-module-reset' ),
 				esc_html__( 'Error', 'wp-module-reset' ),
@@ -199,6 +193,55 @@ class ToolsPage {
 		// Safe to use wp_safe_redirect here — no third-party plugins are loaded.
 		wp_safe_redirect( admin_url( 'admin.php?page=' . self::get_slug() . '&reset_complete=1' ) );
 		exit;
+	}
+
+	/**
+	 * Determine whether the current request targets the reset tools page.
+	 *
+	 * @return bool
+	 */
+	private function is_reset_page_request() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return isset( $_GET['page'] ) && self::get_slug() === $_GET['page'];
+	}
+
+	/**
+	 * Verify the reset nonce from the request.
+	 *
+	 * @return bool
+	 */
+	private function verify_nonce() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! isset( $_POST[ self::NONCE_NAME ] ) ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$raw_nonce = wp_unslash( $_POST[ self::NONCE_NAME ] );
+
+		return wp_verify_nonce( sanitize_text_field( $raw_nonce ), self::NONCE_ACTION );
+	}
+
+	/**
+	 * Check whether the current user is allowed to run a factory reset.
+	 *
+	 * @return bool
+	 */
+	private function current_user_can_reset() {
+		return Permissions::is_admin();
+	}
+
+	/**
+	 * Validate the user-provided confirmation URL against the site URL.
+	 *
+	 * @param string $confirmation_url Raw URL provided by the user.
+	 * @return bool
+	 */
+	private function is_confirmation_url_valid( $confirmation_url ) {
+		$expected_url  = untrailingslashit( home_url() );
+		$submitted_url = untrailingslashit( $confirmation_url );
+
+		return $expected_url === $submitted_url;
 	}
 
 	/**
@@ -236,221 +279,14 @@ class ToolsPage {
 	 */
 	private function render_confirmation( $error = false ) {
 		$home_url = untrailingslashit( home_url() );
-		?>
-		<div class="wrap">
-			<style>
-				.nfd-reset-page {
-					max-width: 900px;
-					margin: 0 auto;
-					padding: 2rem;
-					font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-				}
-				.nfd-reset-page h1 {
-					font-size: 1.5rem;
-					font-weight: 700;
-					margin: 0 0 0.5rem;
-				}
-				.nfd-reset-page .nfd-reset-subtitle {
-					color: #646970;
-					font-size: 14px;
-					margin: 0 0 2rem;
-				}
-				.nfd-reset-warning {
-					background: #fff;
-					border: 1px solid #dc3232;
-					border-left-width: 4px;
-					border-radius: 4px;
-					padding: 24px;
-					margin: 0 0 24px;
-				}
-				.nfd-reset-warning h2 {
-					color: #dc3232;
-					font-size: 1rem;
-					font-weight: 600;
-					margin: 0 0 12px;
-				}
-				.nfd-reset-warning p {
-					font-size: 14px;
-					color: #1e1e1e;
-					line-height: 1.6;
-					margin: 0 0 8px;
-				}
-				.nfd-reset-warning ul {
-					list-style: disc;
-					padding-left: 20px;
-					margin: 8px 0 12px;
-				}
-				.nfd-reset-warning ul li {
-					font-size: 14px;
-					color: #1e1e1e;
-					margin-bottom: 6px;
-					line-height: 1.5;
-				}
-				.nfd-reset-warning .nfd-reset-preserved {
-					color: #646970;
-					font-size: 13px;
-					margin-top: 12px;
-				}
-				.nfd-reset-confirm-field {
-					margin: 0 0 24px;
-				}
-				.nfd-reset-confirm-field label {
-					display: block;
-					font-weight: 600;
-					font-size: 14px;
-					margin-bottom: 8px;
-				}
-				.nfd-reset-confirm-field input[type="text"] {
-					width: 100%;
-					max-width: 420px;
-					padding: 10px 12px;
-					font-size: 14px;
-					border: 1px solid #8c8f94;
-					border-radius: 4px;
-					box-shadow: none;
-				}
-.nfd-reset-confirm-field code {
-					background: #f0f0f1;
-					padding: 2px 6px;
-					font-size: 13px;
-					border-radius: 2px;
-				}
-				.nfd-reset-submit {
-					background: #d63638 !important;
-					border-color: #d63638 !important;
-					color: #fff !important;
-					padding: 8px 24px !important;
-					font-size: 14px !important;
-					font-weight: 500 !important;
-					border-radius: 4px !important;
-					cursor: pointer;
-					line-height: 1.5 !important;
-					min-height: 40px !important;
-				}
-				.nfd-reset-submit:disabled {
-					background: #e6e6e6 !important;
-					border-color: #babac3 !important;
-					color: #7d7d7d !important;
-					cursor: not-allowed;
-				}
-				.nfd-reset-submit.nfd-resetting:disabled {
-					color: #000000 !important;
-				}
-				.nfd-reset-submit .nfd-spinner {
-					display: inline-block;
-					width: 14px;
-					height: 14px;
-					border: 2px solid rgba(0, 0, 0, 0.2);
-					border-top-color: #000;
-					border-radius: 50%;
-					animation: nfd-spin 0.6s linear infinite;
-					vertical-align: middle;
-					margin-right: 6px;
-				}
-				@keyframes nfd-spin {
-					to { transform: rotate(360deg); }
-				}
-				.nfd-reset-submit:hover:not(:disabled) {
-					background: #b32d2e !important;
-					border-color: #b32d2e !important;
-				}
-				.nfd-reset-error {
-					background: #fcf0f1;
-					border: 1px solid #dc3232;
-					border-left-width: 4px;
-					border-radius: 4px;
-					padding: 12px 16px;
-					margin: 0 0 24px;
-					font-size: 14px;
-				}
-			</style>
 
-			<div class="nfd-reset-page">
-				<h1><?php esc_html_e( 'Factory Reset Website', 'wp-module-reset' ); ?></h1>
-				<p class="nfd-reset-subtitle"><?php esc_html_e( 'Restore your website to a fresh WordPress installation.', 'wp-module-reset' ); ?></p>
-
-				<?php if ( $error ) : ?>
-					<div class="nfd-reset-error">
-						<strong><?php echo esc_html( $error ); ?></strong>
-					</div>
-				<?php endif; ?>
-
-				<div class="nfd-reset-warning">
-					<h2><?php esc_html_e( 'This action is permanent and cannot be undone.', 'wp-module-reset' ); ?></h2>
-					<p><?php esc_html_e( 'Performing a factory reset will:', 'wp-module-reset' ); ?></p>
-					<ul>
-						<li><?php esc_html_e( 'Delete all database content (posts, pages, comments, settings, custom tables)', 'wp-module-reset' ); ?></li>
-						<li>
-							<?php
-							printf(
-								/* translators: %s: brand plugin name, e.g. "The Bluehost Plugin" */
-								esc_html__( 'Remove all plugins and themes (except %s and default theme)', 'wp-module-reset' ),
-								esc_html( BrandConfig::get_brand_name() )
-							);
-							?>
-						</li>
-						<li><?php esc_html_e( 'Delete all uploaded media files', 'wp-module-reset' ); ?></li>
-						<li><?php esc_html_e( 'Destroy any staging sites', 'wp-module-reset' ); ?></li>
-					</ul>
-					<p class="nfd-reset-preserved"><?php esc_html_e( 'Your admin account and site URL will be preserved.', 'wp-module-reset' ); ?></p>
-				</div>
-
-				<form method="post" id="nfd-reset-form">
-					<?php wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME ); ?>
-
-					<div class="nfd-reset-confirm-field">
-						<label for="confirmation_url">
-							<?php
-							printf(
-								/* translators: %s: The site URL the user must type to confirm */
-								esc_html__( 'To confirm, type your website URL: %s', 'wp-module-reset' ),
-								'<code>' . esc_html( $home_url ) . '</code>'
-							);
-							?>
-						</label>
-						<input
-							type="text"
-							id="confirmation_url"
-							name="confirmation_url"
-							autocomplete="off"
-							spellcheck="false"
-							placeholder=""
-						/>
-					</div>
-
-					<button type="submit" class="button nfd-reset-submit" id="nfd-reset-button" disabled>
-						<?php esc_html_e( 'Reset Website', 'wp-module-reset' ); ?>
-					</button>
-				</form>
-			</div>
-
-			<script>
-			(function() {
-				var input = document.getElementById('confirmation_url');
-				var button = document.getElementById('nfd-reset-button');
-				var form = document.getElementById('nfd-reset-form');
-				var expected = <?php echo wp_json_encode( $home_url ); ?>;
-
-				if (input && button) {
-					input.addEventListener('input', function() {
-						var value = this.value.replace(/\/+$/, '');
-						button.disabled = (value !== expected);
-					});
-				}
-
-				if (form && button) {
-					form.addEventListener('submit', function() {
-						button.disabled = true;
-						button.classList.add('nfd-resetting');
-						button.innerHTML = '<span class="nfd-spinner"></span> <?php echo esc_js( __( 'Resetting...', 'wp-module-reset' ) ); ?>';
-						input.readOnly = true;
-						input.style.opacity = '0.5';
-					});
-				}
-			})();
-			</script>
-		</div>
-		<?php
+		$this->load_view(
+			'reset-confirmation',
+			array(
+				'home_url' => $home_url,
+				'error'    => $error,
+			)
+		);
 	}
 
 	/**
@@ -464,221 +300,38 @@ class ToolsPage {
 		$steps        = ! empty( $result['steps'] ) ? $result['steps'] : array();
 		$errors       = ! empty( $result['errors'] ) ? $result['errors'] : array();
 		$has_errors   = ! empty( $errors );
-		?>
-		<div class="wrap">
-			<style>
-				.nfd-reset-page {
-					max-width: 900px;
-					margin: 0 auto;
-					padding: 2rem;
-					font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-				}
-				.nfd-reset-page h1 {
-					font-size: 1.5rem;
-					font-weight: 700;
-					margin: 0 0 0.5rem;
-				}
-				.nfd-reset-page .nfd-reset-subtitle {
-					color: #646970;
-					font-size: 14px;
-					margin: 0 0 2rem;
-				}
-				.nfd-reset-result {
-					background: #fff;
-					border: 1px solid <?php echo $has_errors ? '#dc3232' : '#00a32a'; ?>;
-					border-left-width: 4px;
-					border-radius: 4px;
-					padding: 24px;
-					margin: 0 0 24px;
-				}
-				.nfd-reset-result h2 {
-					color: <?php echo $has_errors ? '#dc3232' : '#00a32a'; ?>;
-					font-size: 1rem;
-					font-weight: 600;
-					margin: 0 0 12px;
-				}
-				.nfd-reset-result p {
-					font-size: 14px;
-					color: #1e1e1e;
-					line-height: 1.6;
-					margin: 0 0 8px;
-				}
-				.nfd-reset-result ul {
-					list-style: disc;
-					padding-left: 20px;
-					margin: 8px 0 12px;
-				}
-				.nfd-reset-result ul li {
-					font-size: 14px;
-					color: #1e1e1e;
-					margin-bottom: 6px;
-					line-height: 1.5;
-				}
-				.nfd-reset-result .nfd-reset-preserved {
-					color: #646970;
-					font-size: 13px;
-					margin-top: 12px;
-				}
-				.nfd-reset-steps {
-					margin: 0;
-				}
-				.nfd-reset-steps table {
-					border-collapse: collapse;
-					width: 100%;
-				}
-				.nfd-reset-steps td {
-					padding: 8px 12px;
-					border-bottom: 1px solid #f0f0f1;
-					font-size: 14px;
-					line-height: 1.5;
-				}
-				.nfd-reset-step-success {
-					color: #00a32a;
-					font-weight: 600;
-				}
-				.nfd-reset-step-fail {
-					color: #dc3232;
-					font-weight: 600;
-				}
-				.nfd-reset-errors {
-					margin-top: 16px;
-					padding: 12px 16px;
-					background: #fcf0f1;
-					border-radius: 4px;
-					font-size: 14px;
-				}
-				.nfd-reset-errors ul {
-					margin: 6px 0 0 16px;
-					list-style: disc;
-				}
-				.nfd-reset-cta-group {
-					display: flex;
-					gap: 12px;
-					align-items: center;
-					flex-wrap: wrap;
-				}
-				.nfd-reset-cta-primary {
-					display: inline-block;
-					padding: 10px 24px;
-					background: #2271b1;
-					color: #fff;
-					text-decoration: none;
-					border-radius: 4px;
-					font-size: 14px;
-					font-weight: 500;
-					line-height: 1.5;
-				}
-				.nfd-reset-cta-primary:hover {
-					background: #135e96;
-					color: #fff;
-				}
-				.nfd-reset-cta-secondary {
-					display: inline-block;
-					padding: 10px 24px;
-					background: transparent;
-					color: #2271b1;
-					text-decoration: none;
-					border: 1px solid #2271b1;
-					border-radius: 4px;
-					font-size: 14px;
-					font-weight: 500;
-					line-height: 1.5;
-				}
-				.nfd-reset-cta-secondary:hover {
-					background: #f0f0f1;
-					color: #135e96;
-					border-color: #135e96;
-				}
-			</style>
+		$hide_chrome  = $success && ! $has_errors;
 
-			<div class="nfd-reset-page">
-				<h1><?php esc_html_e( 'Factory Reset Complete', 'wp-module-reset' ); ?></h1>
-				<p class="nfd-reset-subtitle"><?php esc_html_e( 'Your website has been restored to a fresh WordPress installation.', 'wp-module-reset' ); ?></p>
+		$this->load_view(
+			'reset-results',
+			array(
+				'success'      => $success,
+				'redirect_url' => $redirect_url,
+				'steps'        => $steps,
+				'errors'       => $errors,
+				'has_errors'   => $has_errors,
+				'hide_chrome'  => $hide_chrome,
+			)
+		);
+	}
 
-				<?php if ( $has_errors ) : ?>
-					<?php // Detailed technical view — shown only when errors occurred. ?>
-					<div class="nfd-reset-result">
-						<h2><?php esc_html_e( 'Reset completed with errors.', 'wp-module-reset' ); ?></h2>
+	/**
+	 * Load a PHP view file for the tools page.
+	 *
+	 * @param string $view View slug (without extension).
+	 * @param array  $data Data to extract into the view scope.
+	 */
+	private function load_view( $view, array $data = array() ) {
+		if ( ! empty( $data ) ) {
+			// phpcs:ignore WordPress.PHP.DontExtract.extract_extract
+			extract( $data, EXTR_SKIP );
+		}
 
-						<?php if ( ! empty( $steps ) ) : ?>
-							<div class="nfd-reset-steps">
-								<table>
-									<?php foreach ( $steps as $step_name => $step_data ) : ?>
-										<tr>
-											<td>
-												<?php if ( ! empty( $step_data['success'] ) ) : ?>
-													<span class="nfd-reset-step-success">&#10003;</span>
-												<?php else : ?>
-													<span class="nfd-reset-step-fail">&#10007;</span>
-												<?php endif; ?>
-											</td>
-											<td><?php echo esc_html( self::format_step_name( $step_name ) ); ?></td>
-											<td><?php echo esc_html( ! empty( $step_data['message'] ) ? $step_data['message'] : '' ); ?></td>
-										</tr>
-									<?php endforeach; ?>
-								</table>
-							</div>
-						<?php endif; ?>
+		$view_file = __DIR__ . '/views/' . $view . '.php';
 
-						<div class="nfd-reset-errors">
-							<strong><?php esc_html_e( 'Errors:', 'wp-module-reset' ); ?></strong>
-							<ul>
-								<?php foreach ( $errors as $err ) : ?>
-									<li><?php echo esc_html( $err ); ?></li>
-								<?php endforeach; ?>
-							</ul>
-						</div>
-					</div>
-
-					<div class="nfd-reset-cta-group">
-						<a href="<?php echo esc_url( $redirect_url ); ?>" class="nfd-reset-cta-primary">
-							<?php esc_html_e( 'Continue to Dashboard', 'wp-module-reset' ); ?>
-						</a>
-					</div>
-
-				<?php else : ?>
-					<?php // Simple success view — mirrors the confirmation screen style but green/positive. ?>
-					<div class="nfd-reset-result">
-						<h2><?php esc_html_e( 'Your website has been reset successfully.', 'wp-module-reset' ); ?></h2>
-						<p><?php esc_html_e( 'The factory reset is complete. Your site has been restored to a clean state:', 'wp-module-reset' ); ?></p>
-						<ul>
-							<li><?php esc_html_e( 'All database content has been cleared (posts, pages, comments, settings)', 'wp-module-reset' ); ?></li>
-							<li><?php esc_html_e( 'Third-party plugins and themes have been removed', 'wp-module-reset' ); ?></li>
-							<li><?php esc_html_e( 'Uploaded media files have been deleted', 'wp-module-reset' ); ?></li>
-							<li><?php esc_html_e( 'WordPress core and default theme have been freshly reinstalled', 'wp-module-reset' ); ?></li>
-							<li>
-								<?php
-								printf(
-									/* translators: %s: brand plugin name, e.g. "The Bluehost Plugin" */
-									esc_html__( '%s is active and connected', 'wp-module-reset' ),
-									esc_html( BrandConfig::get_brand_name() )
-								);
-								?>
-							</li>
-						</ul>
-						<p class="nfd-reset-preserved"><?php esc_html_e( 'Your admin account and site URL have been preserved.', 'wp-module-reset' ); ?></p>
-					</div>
-
-					<div class="nfd-reset-cta-group">
-						<a href="<?php echo esc_url( admin_url( 'index.php?page=nfd-onboarding' ) ); ?>" class="nfd-reset-cta-primary">
-							<?php esc_html_e( 'Set up my site', 'wp-module-reset' ); ?>
-						</a>
-						<a href="<?php echo esc_url( $redirect_url ); ?>" class="nfd-reset-cta-secondary">
-							<?php esc_html_e( 'Exit to dashboard', 'wp-module-reset' ); ?>
-						</a>
-					</div>
-
-					<style>
-						#wpadminbar,
-						#adminmenumain,
-						#wpfooter { display: none !important; }
-						#wpcontent { margin-left: 0 !important; }
-						html.wp-toolbar { padding-top: 0 !important; }
-					</style>
-				<?php endif; ?>
-			</div>
-		</div>
-		<?php
+		if ( file_exists( $view_file ) ) {
+			require $view_file;
+		}
 	}
 
 	/**
@@ -687,7 +340,7 @@ class ToolsPage {
 	 * @param string $step_name The step key name.
 	 * @return string Formatted name.
 	 */
-	private static function format_step_name( $step_name ) {
+	public static function format_step_name( $step_name ) {
 		$map = array(
 			'install_theme'        => 'Install default theme',
 			'deactivate_plugins'   => 'Deactivate third-party plugins',

@@ -5,6 +5,7 @@ namespace NewfoldLabs\WP\Module\Reset\Tests\WPUnit;
 use lucatume\WPBrowser\TestCase\WPTestCase;
 use NewfoldLabs\WP\Module\Reset\Admin\ToolsPage;
 use NewfoldLabs\WP\Module\Reset\Data\BrandConfig;
+use ReflectionMethod;
 
 /**
  * Test the Tools admin page registration and configuration.
@@ -90,5 +91,45 @@ class ToolsPageWPUnitTest extends WPTestCase {
 
 	public function test_nonce_name_constant_defined() {
 		$this->assertSame( 'nfd_factory_reset_nonce', ToolsPage::NONCE_NAME );
+	}
+
+	/**
+	 * Test format_step_name returns mapped label for known step.
+	 */
+	public function test_format_step_name_returns_mapped_label_for_known_step() {
+		$method = new ReflectionMethod( ToolsPage::class, 'format_step_name' );
+		$method->setAccessible( true );
+
+		$this->assertSame( 'Install default theme', $method->invoke( null, 'install_theme' ) );
+		$this->assertSame( 'Reset database', $method->invoke( null, 'reset_database' ) );
+		$this->assertSame( 'Restore hosting connection', $method->invoke( null, 'restore_nfd_data' ) );
+	}
+
+	/**
+	 * Test format_step_name returns ucwords fallback for unknown step.
+	 */
+	public function test_format_step_name_returns_ucwords_for_unknown_step() {
+		$method = new ReflectionMethod( ToolsPage::class, 'format_step_name' );
+		$method->setAccessible( true );
+
+		$this->assertSame( 'Unknown Step Name', $method->invoke( null, 'unknown_step_name' ) );
+	}
+
+	/**
+	 * Regression: confirmation page must not mention MU plugins / drop-in files.
+	 */
+	public function test_confirmation_output_does_not_contain_mu_plugins_line() {
+		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $user_id );
+
+		$page = new ToolsPage();
+		$page->register_page();
+
+		ob_start();
+		$page->render_page();
+		$output = ob_get_clean();
+
+		$this->assertStringNotContainsString( 'MU plugins', $output );
+		$this->assertStringNotContainsString( 'drop-in files', $output );
 	}
 }
