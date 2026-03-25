@@ -3,6 +3,9 @@
 namespace NewfoldLabs\WP\Module\Reset\Services;
 
 use NewfoldLabs\WP\Module\Reset\Data\BrandConfig;
+use function __;
+use function _n;
+use function sprintf;
 
 /**
  * Core factory reset execution logic.
@@ -45,7 +48,7 @@ class ResetService {
 				'success' => false,
 				'data'    => array(),
 				'steps'   => array(),
-				'errors'  => array( 'Unauthorized. You must be an administrator to perform a factory reset.' ),
+				'errors'  => array( __( 'Unauthorized. You must be an administrator to perform a factory reset.', 'wp-module-reset' ) ),
 			);
 		}
 
@@ -54,7 +57,7 @@ class ResetService {
 				'success' => false,
 				'data'    => array(),
 				'steps'   => array(),
-				'errors'  => array( 'Factory reset is not supported on WordPress multisite installations.' ),
+				'errors'  => array( __( 'Factory reset is not supported on WordPress multisite installations.', 'wp-module-reset' ) ),
 			);
 		}
 
@@ -70,7 +73,7 @@ class ResetService {
 				'success' => false,
 				'data'    => array(),
 				'steps'   => array(),
-				'errors'  => array( 'Unable to initialize the WordPress filesystem.' ),
+				'errors'  => array( __( 'Unable to initialize the WordPress filesystem.', 'wp-module-reset' ) ),
 			);
 		}
 
@@ -133,7 +136,7 @@ class ResetService {
 				'success' => false,
 				'data'    => array(),
 				'steps'   => $steps,
-				'errors'  => array( 'Failed to install the default theme. Reset aborted with no changes made.' ),
+				'errors'  => array( __( 'Failed to install the default theme. Reset aborted with no changes made.', 'wp-module-reset' ) ),
 			);
 		}
 
@@ -146,7 +149,7 @@ class ResetService {
 		update_option( 'active_plugins', array( $brand_basename ) );
 		$steps['deactivate_plugins'] = array(
 			'success' => true,
-			'message' => 'Third-party plugins deactivated.',
+			'message' => __( 'Third-party plugins deactivated.', 'wp-module-reset' ),
 		);
 
 		// -------------------------------------------------------------------
@@ -196,7 +199,7 @@ class ResetService {
 		// -------------------------------------------------------------------
 		$steps['staging_cleanup'] = array(
 			'success' => true,
-			'message' => 'Staging data will be cleared with database reset.',
+			'message' => __( 'Staging data will be cleared with database reset.', 'wp-module-reset' ),
 		);
 
 		// -------------------------------------------------------------------
@@ -235,7 +238,7 @@ class ResetService {
 		);
 
 		if ( ! $steps['reset_database']['success'] ) {
-			$errors[] = 'Database reset encountered errors.';
+			$errors[] = __( 'Database reset encountered errors.', 'wp-module-reset' );
 		}
 
 		// -------------------------------------------------------------------
@@ -301,7 +304,7 @@ class ResetService {
 		// Collect errors from steps.
 		foreach ( $steps as $step_name => $step_result ) {
 			if ( ! $step_result['success'] && ! empty( $step_result['message'] ) ) {
-				$errors[] = $step_name . ': ' . $step_result['message'];
+				$errors[] = self::get_step_label( $step_name ) . ': ' . $step_result['message'];
 			}
 		}
 
@@ -332,7 +335,11 @@ class ResetService {
 		} catch ( \Throwable $e ) {
 			return array(
 				'success' => false,
-				'message' => 'Error: ' . $e->getMessage(),
+				'message' => sprintf(
+					/* translators: %s: PHP exception or error message. */
+					__( 'Error: %s', 'wp-module-reset' ),
+					$e->getMessage()
+				),
 			);
 		}
 	}
@@ -366,7 +373,7 @@ class ResetService {
 
 		return array(
 			'success' => true,
-			'message' => 'Site ready to be reset.',
+			'message' => __( 'Site ready to be reset.', 'wp-module-reset' ),
 		);
 	}
 
@@ -398,7 +405,7 @@ class ResetService {
 		if ( $theme->exists() ) {
 			return array(
 				'success' => true,
-				'message' => 'Theme already installed.',
+				'message' => __( 'Theme already installed.', 'wp-module-reset' ),
 			);
 		}
 
@@ -417,7 +424,11 @@ class ResetService {
 		if ( is_wp_error( $api ) ) {
 			return array(
 				'success' => false,
-				'message' => 'Could not fetch theme information: ' . $api->get_error_message(),
+				'message' => sprintf(
+					/* translators: %s: Error message from WordPress.org API. */
+					__( 'Could not fetch theme information: %s', 'wp-module-reset' ),
+					$api->get_error_message()
+				),
 			);
 		}
 
@@ -432,20 +443,24 @@ class ResetService {
 		if ( is_wp_error( $result ) ) {
 			return array(
 				'success' => false,
-				'message' => 'Theme installation failed: ' . $result->get_error_message(),
+				'message' => sprintf(
+					/* translators: %s: Error message from the theme installer. */
+					__( 'Theme installation failed: %s', 'wp-module-reset' ),
+					$result->get_error_message()
+				),
 			);
 		}
 
 		if ( ! $result ) {
 			return array(
 				'success' => false,
-				'message' => 'Theme installation failed.',
+				'message' => __( 'Theme installation failed.', 'wp-module-reset' ),
 			);
 		}
 
 		return array(
 			'success' => true,
-			'message' => 'Theme installed successfully.',
+			'message' => __( 'Theme installed successfully.', 'wp-module-reset' ),
 		);
 	}
 
@@ -478,7 +493,7 @@ class ResetService {
 		if ( empty( $plugins_to_remove ) ) {
 			return array(
 				'success' => true,
-				'message' => 'No third-party plugins to remove.',
+				'message' => __( 'No third-party plugins to remove.', 'wp-module-reset' ),
 			);
 		}
 
@@ -510,13 +525,28 @@ class ResetService {
 		if ( ! empty( $errors ) ) {
 			return array(
 				'success' => false,
-				'message' => sprintf( 'Removed %d of %d plugin(s). Failed to remove: %s', $removed, $total, implode( ', ', $errors ) ),
+				'message' => sprintf(
+					/* translators: 1: Number of plugins removed, 2: Total plugin count, 3: Comma-separated list of plugin paths that failed. */
+					__( 'Removed %1$d of %2$d plugin(s). Failed to remove: %3$s', 'wp-module-reset' ),
+					$removed,
+					$total,
+					implode( ', ', $errors )
+				),
 			);
 		}
 
 		return array(
 			'success' => true,
-			'message' => sprintf( 'Removed %d plugin(s).', $removed ),
+			'message' => sprintf(
+				/* translators: %d: Number of plugins removed. */
+				_n(
+					'Removed %d plugin.',
+					'Removed %d plugins.',
+					$removed,
+					'wp-module-reset'
+				),
+				$removed
+			),
 		);
 	}
 
@@ -552,13 +582,28 @@ class ResetService {
 		if ( ! empty( $errors ) ) {
 			return array(
 				'success' => false,
-				'message' => sprintf( 'Removed %d of %d theme(s). Failed to remove: %s', $removed_count, $total, implode( '; ', $errors ) ),
+				'message' => sprintf(
+					/* translators: 1: Number of themes removed, 2: Total theme count, 3: Semicolon-separated error details. */
+					__( 'Removed %1$d of %2$d theme(s). Failed to remove: %3$s', 'wp-module-reset' ),
+					$removed_count,
+					$total,
+					implode( '; ', $errors )
+				),
 			);
 		}
 
 		return array(
 			'success' => true,
-			'message' => sprintf( 'Removed %d theme(s).', $removed_count ),
+			'message' => sprintf(
+				/* translators: %d: Number of themes removed. */
+				_n(
+					'Removed %d theme.',
+					'Removed %d themes.',
+					$removed_count,
+					'wp-module-reset'
+				),
+				$removed_count
+			),
 		);
 	}
 
@@ -582,7 +627,7 @@ class ResetService {
 		if ( ! $wp_filesystem->is_dir( $mu_plugin_dir ) ) {
 			return array(
 				'success' => true,
-				'message' => 'No MU plugins directory found.',
+				'message' => __( 'No MU plugins directory found.', 'wp-module-reset' ),
 			);
 		}
 
@@ -598,7 +643,16 @@ class ResetService {
 
 		return array(
 			'success' => true,
-			'message' => sprintf( 'Removed %d MU plugin file(s)/folder(s).', $removed_count ),
+			'message' => sprintf(
+				/* translators: %d: Number of MU plugin files or folders removed. */
+				_n(
+					'Removed %d MU plugin file or folder.',
+					'Removed %d MU plugin files or folders.',
+					$removed_count,
+					'wp-module-reset'
+				),
+				$removed_count
+			),
 		);
 	}
 
@@ -642,7 +696,16 @@ class ResetService {
 
 		return array(
 			'success' => true,
-			'message' => sprintf( 'Removed %d drop-in file(s).', $removed_count ),
+			'message' => sprintf(
+				/* translators: %d: Number of drop-in files removed. */
+				_n(
+					'Removed %d drop-in file.',
+					'Removed %d drop-in files.',
+					$removed_count,
+					'wp-module-reset'
+				),
+				$removed_count
+			),
 		);
 	}
 
@@ -679,7 +742,16 @@ class ResetService {
 
 		return array(
 			'success' => true,
-			'message' => sprintf( 'Removed %d extra wp-content item(s).', $removed_count ),
+			'message' => sprintf(
+				/* translators: %d: Number of extra items removed from wp-content. */
+				_n(
+					'Removed %d extra wp-content item.',
+					'Removed %d extra wp-content items.',
+					$removed_count,
+					'wp-module-reset'
+				),
+				$removed_count
+			),
 		);
 	}
 
@@ -708,7 +780,7 @@ class ResetService {
 
 		return array(
 			'success' => true,
-			'message' => 'Uploads directory cleaned.',
+			'message' => __( 'Uploads directory cleaned.', 'wp-module-reset' ),
 		);
 	}
 
@@ -755,7 +827,11 @@ class ResetService {
 
 			return array(
 				'success' => true,
-				'message' => 'Database reset (email notification skipped: ' . $e->getMessage() . ').',
+				'message' => sprintf(
+					/* translators: %s: Technical error message (email failure or other). */
+					__( 'Database reset (email notification skipped: %s).', 'wp-module-reset' ),
+					$e->getMessage()
+				),
 				'user_id' => $user ? $user->ID : 1,
 			);
 		}
@@ -763,14 +839,18 @@ class ResetService {
 		if ( is_wp_error( $result ) ) {
 			return array(
 				'success' => false,
-				'message' => 'wp_install failed: ' . $result->get_error_message(),
+				'message' => sprintf(
+					/* translators: %s: Error message from wp_install(). */
+					__( 'wp_install failed: %s', 'wp-module-reset' ),
+					$result->get_error_message()
+				),
 				'user_id' => 0,
 			);
 		}
 
 		return array(
 			'success' => true,
-			'message' => 'Database reset and WordPress reinstalled.',
+			'message' => __( 'Database reset and WordPress reinstalled.', 'wp-module-reset' ),
 			'user_id' => $result['user_id'],
 		);
 	}
@@ -791,7 +871,7 @@ class ResetService {
 		if ( ! $db_result['success'] || empty( $db_result['user_id'] ) ) {
 			return array(
 				'success' => false,
-				'message' => 'Cannot restore values: database reset did not complete.',
+				'message' => __( 'Cannot restore values: database reset did not complete.', 'wp-module-reset' ),
 			);
 		}
 
@@ -819,7 +899,7 @@ class ResetService {
 
 		return array(
 			'success' => true,
-			'message' => 'Preserved values restored.',
+			'message' => __( 'Preserved values restored.', 'wp-module-reset' ),
 		);
 	}
 
@@ -840,7 +920,9 @@ class ResetService {
 		$updates = get_core_updates();
 
 		if ( empty( $updates ) || is_wp_error( $updates ) ) {
-			$msg = is_wp_error( $updates ) ? $updates->get_error_message() : 'No core update offers available.';
+			$msg = is_wp_error( $updates )
+				? $updates->get_error_message()
+				: __( 'No core update offers available.', 'wp-module-reset' );
 			return array(
 				'success' => false,
 				'message' => $msg,
@@ -863,13 +945,19 @@ class ResetService {
 		if ( is_wp_error( $result ) || false === $result || ! empty( $errors ) ) {
 			return array(
 				'success' => false,
-				'message' => 'Core reinstall failed: ' . ( ! empty( $errors ) ? implode( '; ', $errors ) : 'Unknown error.' ),
+				'message' => sprintf(
+					/* translators: %s: Semicolon-separated error messages, or a generic unknown error string. */
+					__( 'Core reinstall failed: %s', 'wp-module-reset' ),
+					! empty( $errors )
+						? implode( '; ', $errors )
+						: __( 'Unknown error.', 'wp-module-reset' )
+				),
 			);
 		}
 
 		return array(
 			'success' => true,
-			'message' => 'WordPress core reinstalled.',
+			'message' => __( 'WordPress core reinstalled.', 'wp-module-reset' ),
 		);
 	}
 
@@ -894,7 +982,11 @@ class ResetService {
 		if ( ! $result['success'] ) {
 			return array(
 				'success' => false,
-				'message' => 'Theme reinstall failed: ' . $result['message'],
+				'message' => sprintf(
+					/* translators: %s: Error message from the theme reinstall step. */
+					__( 'Theme reinstall failed: %s', 'wp-module-reset' ),
+					$result['message']
+				),
 			);
 		}
 
@@ -903,7 +995,7 @@ class ResetService {
 
 		return array(
 			'success' => true,
-			'message' => 'Default theme reinstalled.',
+			'message' => __( 'Default theme reinstalled.', 'wp-module-reset' ),
 		);
 	}
 
@@ -955,7 +1047,7 @@ class ResetService {
 
 		return array(
 			'success' => true,
-			'message' => 'Restored hosting connection data and token.',
+			'message' => __( 'Restored hosting connection data and token.', 'wp-module-reset' ),
 		);
 	}
 
@@ -971,7 +1063,7 @@ class ResetService {
 
 		return array(
 			'success' => true,
-			'message' => 'Session restored.',
+			'message' => __( 'Session restored.', 'wp-module-reset' ),
 		);
 	}
 
@@ -996,7 +1088,7 @@ class ResetService {
 		);
 
 		if ( empty( $oldest_post ) || 1 !== (int) $oldest_post[0]->ID ) {
-			$failures[] = 'Oldest post ID is not 1';
+			$failures[] = __( 'Oldest post ID is not 1', 'wp-module-reset' );
 		}
 
 		$newest_post = get_posts(
@@ -1013,31 +1105,75 @@ class ResetService {
 
 		if ( ! empty( $oldest_post ) && ! empty( $newest_post ) ) {
 			if ( $oldest_post[0]->post_modified_gmt !== $newest_post[0]->post_modified_gmt ) {
-				$failures[] = 'Oldest and newest posts have different modification times';
+				$failures[] = __( 'Oldest and newest posts have different modification times', 'wp-module-reset' );
 			}
 		}
 
 		$user = get_userdata( 1 );
 		if ( ! $user ) {
-			$failures[] = 'User with ID 1 does not exist';
+			$failures[] = __( 'User with ID 1 does not exist', 'wp-module-reset' );
 		}
 
 		$user_count = count_users();
 		$total      = isset( $user_count['total_users'] ) ? (int) $user_count['total_users'] : 0;
 		if ( 1 !== $total ) {
-			$failures[] = sprintf( 'Expected 1 user, found %d', $total );
+			$failures[] = sprintf(
+				/* translators: %d: Number of users found in the database. */
+				__( 'Expected 1 user, found %d', 'wp-module-reset' ),
+				$total
+			);
 		}
 
 		if ( ! empty( $failures ) ) {
 			return array(
 				'success' => false,
-				'message' => 'Fresh install check failed: ' . implode( '; ', $failures ),
+				'message' => sprintf(
+					/* translators: %s: Semicolon-separated list of verification failure messages. */
+					__( 'Fresh install check failed: %s', 'wp-module-reset' ),
+					implode( '; ', $failures )
+				),
 			);
 		}
 
 		return array(
 			'success' => true,
-			'message' => 'Site passes fresh install detection.',
+			'message' => __( 'Site passes fresh install detection.', 'wp-module-reset' ),
 		);
+	}
+
+	/**
+	 * Human-readable label for a reset step (translated).
+	 *
+	 * Used in admin UI and aggregated error messages.
+	 *
+	 * @param string $step_name The step key name.
+	 * @return string
+	 */
+	public static function get_step_label( $step_name ) {
+		$labels = array(
+			'install_theme'        => __( 'Install default theme', 'wp-module-reset' ),
+			'deactivate_plugins'   => __( 'Deactivate third-party plugins', 'wp-module-reset' ),
+			'harden_environment'   => __( 'Prepare environment', 'wp-module-reset' ),
+			'staging_cleanup'      => __( 'Clean up staging sites', 'wp-module-reset' ),
+			'remove_plugins'       => __( 'Remove plugins', 'wp-module-reset' ),
+			'remove_themes'        => __( 'Remove themes', 'wp-module-reset' ),
+			'remove_mu_plugins'    => __( 'Remove MU plugins', 'wp-module-reset' ),
+			'remove_dropins'       => __( 'Remove drop-in files', 'wp-module-reset' ),
+			'clean_wp_content'     => __( 'Clean wp-content directory', 'wp-module-reset' ),
+			'clean_uploads'        => __( 'Clean uploads directory', 'wp-module-reset' ),
+			'reset_database'       => __( 'Reset database', 'wp-module-reset' ),
+			'restore_values'       => __( 'Restore settings', 'wp-module-reset' ),
+			'reinstall_core'       => __( 'Reinstall WordPress core', 'wp-module-reset' ),
+			'reinstall_theme'      => __( 'Reinstall default theme', 'wp-module-reset' ),
+			'restore_nfd_data'     => __( 'Restore hosting connection', 'wp-module-reset' ),
+			'verify_fresh_install' => __( 'Verify fresh install state', 'wp-module-reset' ),
+			'restore_session'      => __( 'Restore session', 'wp-module-reset' ),
+		);
+
+		if ( isset( $labels[ $step_name ] ) ) {
+			return $labels[ $step_name ];
+		}
+
+		return ucwords( str_replace( '_', ' ', $step_name ) );
 	}
 }
