@@ -135,7 +135,7 @@ composer run i18n       # full i18n pipeline (POT + PO + MO + PHP)
 
 ### Testing
 
-See [TESTING.md](TESTING.md) for the full QA guide covering both automated and manual tests.
+See **[docs/testing.md](docs/testing.md)** for the full QA guide (automated, CI, Playwright, and manual).
 
 ```bash
 composer run test              # run automated test suite

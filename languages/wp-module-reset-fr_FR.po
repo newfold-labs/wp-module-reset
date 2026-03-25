@@ -1,0 +1,457 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wp-module-reset\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: French (France)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-03-25T17:27:56+00:00\n"
+"PO-Revision-Date: 2026-03-25T17:38:32+00:00\n"
+"Language: fr_FR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: wp-module-reset\n"
+
+#: includes/Admin/ToolsPage.php:53
+#: includes/Admin/ToolsPage.php:54
+#: includes/Admin/ToolsPage.php:369
+msgid "Factory Reset Website"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:102
+msgid "Security check failed. Please try again."
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:103
+#: includes/Admin/ToolsPage.php:112
+#: includes/Admin/ToolsPage.php:173
+msgid "Error"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:111
+#: includes/Admin/ToolsPage.php:172
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:123
+msgid "The URL you entered does not match your website URL. Please try again."
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:139
+#: includes/Api/Controllers/ResetController.php:100
+msgid "Failed to prepare for reset."
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:183
+msgid "Reset session expired or was not found. Please try again."
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:209
+msgid "You do not have permission to access this page."
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:370
+msgid "Restore your website to a fresh WordPress installation."
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:379
+msgid "This action is permanent and cannot be undone."
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:380
+msgid "Performing a factory reset will:"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:382
+msgid "Delete all database content (posts, pages, comments, settings, custom tables)"
+msgstr ""
+
+#. translators: %s: brand plugin name, e.g. "The Bluehost Plugin"
+#: includes/Admin/ToolsPage.php:387
+#, php-format
+msgid "Remove all plugins and themes (except %s and default theme)"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:392
+msgid "Delete all uploaded media files"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:393
+msgid "Destroy any staging sites"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:395
+msgid "Your admin account and site URL will be preserved."
+msgstr ""
+
+#. translators: %s: The site URL the user must type to confirm
+#: includes/Admin/ToolsPage.php:406
+#, php-format
+msgid "To confirm, type your website URL: %s"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:422
+msgid "Reset Website"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:445
+msgid "Resetting..."
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:595
+msgid "Factory Reset Complete"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:596
+msgid "Your website has been restored to a fresh WordPress installation."
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:601
+msgid "Reset completed with errors."
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:624
+msgid "Errors:"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:635
+msgid "Continue to Dashboard"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:642
+msgid "Your website has been reset successfully."
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:643
+msgid "The factory reset is complete. Your site has been restored to a clean state:"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:645
+msgid "All database content has been cleared (posts, pages, comments, settings)"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:646
+msgid "Third-party plugins and themes have been removed"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:647
+msgid "Uploaded media files have been deleted"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:648
+msgid "WordPress core and default theme have been freshly reinstalled"
+msgstr ""
+
+#. translators: %s: brand plugin name, e.g. "The Bluehost Plugin"
+#: includes/Admin/ToolsPage.php:653
+#, php-format
+msgid "%s is active and connected"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:659
+msgid "Your admin account and site URL have been preserved."
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:664
+msgid "Set up my site"
+msgstr ""
+
+#: includes/Admin/ToolsPage.php:667
+msgid "Exit to dashboard"
+msgstr ""
+
+#: includes/Api/Controllers/ResetController.php:44
+msgid "The site URL typed by the user for confirmation."
+msgstr ""
+
+#: includes/Api/Controllers/ResetController.php:60
+msgid "You do not have permission to perform a factory reset."
+msgstr ""
+
+#: includes/Api/Controllers/ResetController.php:87
+msgid "The confirmation URL does not match your website URL."
+msgstr ""
+
+#: includes/Services/ResetService.php:51
+msgid "Unauthorized. You must be an administrator to perform a factory reset."
+msgstr ""
+
+#: includes/Services/ResetService.php:60
+msgid "Factory reset is not supported on WordPress multisite installations."
+msgstr ""
+
+#: includes/Services/ResetService.php:76
+msgid "Unable to initialize the WordPress filesystem."
+msgstr ""
+
+#: includes/Services/ResetService.php:139
+msgid "Failed to install the default theme. Reset aborted with no changes made."
+msgstr ""
+
+#: includes/Services/ResetService.php:152
+msgid "Third-party plugins deactivated."
+msgstr ""
+
+#: includes/Services/ResetService.php:202
+msgid "Staging data will be cleared with database reset."
+msgstr ""
+
+#: includes/Services/ResetService.php:241
+msgid "Database reset encountered errors."
+msgstr ""
+
+#. translators: %s: PHP exception or error message.
+#: includes/Services/ResetService.php:340
+#, php-format
+msgid "Error: %s"
+msgstr ""
+
+#: includes/Services/ResetService.php:376
+msgid "Site ready to be reset."
+msgstr ""
+
+#: includes/Services/ResetService.php:408
+msgid "Theme already installed."
+msgstr ""
+
+#. translators: %s: Error message from WordPress.org API.
+#: includes/Services/ResetService.php:429
+#, php-format
+msgid "Could not fetch theme information: %s"
+msgstr ""
+
+#. translators: %s: Error message from the theme installer.
+#: includes/Services/ResetService.php:448
+#, php-format
+msgid "Theme installation failed: %s"
+msgstr ""
+
+#: includes/Services/ResetService.php:457
+msgid "Theme installation failed."
+msgstr ""
+
+#: includes/Services/ResetService.php:463
+msgid "Theme installed successfully."
+msgstr ""
+
+#: includes/Services/ResetService.php:496
+msgid "No third-party plugins to remove."
+msgstr ""
+
+#. translators: 1: Number of plugins removed, 2: Total plugin count, 3: Comma-separated list of plugin paths that failed.
+#: includes/Services/ResetService.php:530
+#, php-format
+msgid "Removed %1$d of %2$d plugin(s). Failed to remove: %3$s"
+msgstr ""
+
+#. translators: %d: Number of plugins removed.
+#: includes/Services/ResetService.php:542
+#, php-format
+msgid "Removed %d plugin."
+msgid_plural "Removed %d plugins."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: Number of themes removed, 2: Total theme count, 3: Semicolon-separated error details.
+#: includes/Services/ResetService.php:587
+#, php-format
+msgid "Removed %1$d of %2$d theme(s). Failed to remove: %3$s"
+msgstr ""
+
+#. translators: %d: Number of themes removed.
+#: includes/Services/ResetService.php:599
+#, php-format
+msgid "Removed %d theme."
+msgid_plural "Removed %d themes."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Services/ResetService.php:630
+msgid "No MU plugins directory found."
+msgstr ""
+
+#. translators: %d: Number of MU plugin files or folders removed.
+#: includes/Services/ResetService.php:648
+#, php-format
+msgid "Removed %d MU plugin file or folder."
+msgid_plural "Removed %d MU plugin files or folders."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: Number of drop-in files removed.
+#: includes/Services/ResetService.php:701
+#, php-format
+msgid "Removed %d drop-in file."
+msgid_plural "Removed %d drop-in files."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: Number of extra items removed from wp-content.
+#: includes/Services/ResetService.php:747
+#, php-format
+msgid "Removed %d extra wp-content item."
+msgid_plural "Removed %d extra wp-content items."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Services/ResetService.php:783
+msgid "Uploads directory cleaned."
+msgstr ""
+
+#. translators: %s: Technical error message (email failure or other).
+#: includes/Services/ResetService.php:832
+#, php-format
+msgid "Database reset (email notification skipped: %s)."
+msgstr ""
+
+#. translators: %s: Error message from wp_install().
+#: includes/Services/ResetService.php:844
+#, php-format
+msgid "wp_install failed: %s"
+msgstr ""
+
+#: includes/Services/ResetService.php:853
+msgid "Database reset and WordPress reinstalled."
+msgstr ""
+
+#: includes/Services/ResetService.php:874
+msgid "Cannot restore values: database reset did not complete."
+msgstr ""
+
+#: includes/Services/ResetService.php:902
+msgid "Preserved values restored."
+msgstr ""
+
+#: includes/Services/ResetService.php:925
+msgid "No core update offers available."
+msgstr ""
+
+#. translators: %s: Semicolon-separated error messages, or a generic unknown error string.
+#: includes/Services/ResetService.php:950
+#, php-format
+msgid "Core reinstall failed: %s"
+msgstr ""
+
+#: includes/Services/ResetService.php:953
+msgid "Unknown error."
+msgstr ""
+
+#: includes/Services/ResetService.php:960
+msgid "WordPress core reinstalled."
+msgstr ""
+
+#. translators: %s: Error message from the theme reinstall step.
+#: includes/Services/ResetService.php:987
+#, php-format
+msgid "Theme reinstall failed: %s"
+msgstr ""
+
+#: includes/Services/ResetService.php:998
+msgid "Default theme reinstalled."
+msgstr ""
+
+#: includes/Services/ResetService.php:1050
+msgid "Restored hosting connection data and token."
+msgstr ""
+
+#: includes/Services/ResetService.php:1066
+msgid "Session restored."
+msgstr ""
+
+#: includes/Services/ResetService.php:1091
+msgid "Oldest post ID is not 1"
+msgstr ""
+
+#: includes/Services/ResetService.php:1108
+msgid "Oldest and newest posts have different modification times"
+msgstr ""
+
+#: includes/Services/ResetService.php:1114
+msgid "User with ID 1 does not exist"
+msgstr ""
+
+#. translators: %d: Number of users found in the database.
+#: includes/Services/ResetService.php:1122
+#, php-format
+msgid "Expected 1 user, found %d"
+msgstr ""
+
+#. translators: %s: Semicolon-separated list of verification failure messages.
+#: includes/Services/ResetService.php:1132
+#, php-format
+msgid "Fresh install check failed: %s"
+msgstr ""
+
+#: includes/Services/ResetService.php:1140
+msgid "Site passes fresh install detection."
+msgstr ""
+
+#: includes/Services/ResetService.php:1154
+msgid "Install default theme"
+msgstr ""
+
+#: includes/Services/ResetService.php:1155
+msgid "Deactivate third-party plugins"
+msgstr ""
+
+#: includes/Services/ResetService.php:1156
+msgid "Prepare environment"
+msgstr ""
+
+#: includes/Services/ResetService.php:1157
+msgid "Clean up staging sites"
+msgstr ""
+
+#: includes/Services/ResetService.php:1158
+msgid "Remove plugins"
+msgstr ""
+
+#: includes/Services/ResetService.php:1159
+msgid "Remove themes"
+msgstr ""
+
+#: includes/Services/ResetService.php:1160
+msgid "Remove MU plugins"
+msgstr ""
+
+#: includes/Services/ResetService.php:1161
+msgid "Remove drop-in files"
+msgstr ""
+
+#: includes/Services/ResetService.php:1162
+msgid "Clean wp-content directory"
+msgstr ""
+
+#: includes/Services/ResetService.php:1163
+msgid "Clean uploads directory"
+msgstr ""
+
+#: includes/Services/ResetService.php:1164
+msgid "Reset database"
+msgstr ""
+
+#: includes/Services/ResetService.php:1165
+msgid "Restore settings"
+msgstr ""
+
+#: includes/Services/ResetService.php:1166
+msgid "Reinstall WordPress core"
+msgstr ""
+
+#: includes/Services/ResetService.php:1167
+msgid "Reinstall default theme"
+msgstr ""
+
+#: includes/Services/ResetService.php:1168
+msgid "Restore hosting connection"
+msgstr ""
+
+#: includes/Services/ResetService.php:1169
+msgid "Verify fresh install state"
+msgstr ""
+
+#: includes/Services/ResetService.php:1170
+msgid "Restore session"
+msgstr ""

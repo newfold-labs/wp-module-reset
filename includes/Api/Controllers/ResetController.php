@@ -41,7 +41,7 @@ class ResetController extends \WP_REST_Controller {
 						'required'          => true,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
-						'description'       => 'The site URL typed by the user for confirmation.',
+						'description'       => __( 'The site URL typed by the user for confirmation.', 'wp-module-reset' ),
 					),
 				),
 			)

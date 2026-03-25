@@ -688,26 +688,6 @@ class ToolsPage {
 	 * @return string Formatted name.
 	 */
 	private static function format_step_name( $step_name ) {
-		$map = array(
-			'install_theme'        => 'Install default theme',
-			'deactivate_plugins'   => 'Deactivate third-party plugins',
-			'harden_environment'   => 'Prepare environment',
-			'staging_cleanup'      => 'Clean up staging sites',
-			'remove_plugins'       => 'Remove plugins',
-			'remove_themes'        => 'Remove themes',
-			'remove_mu_plugins'    => 'Remove MU plugins',
-			'remove_dropins'       => 'Remove drop-in files',
-			'clean_wp_content'     => 'Clean wp-content directory',
-			'clean_uploads'        => 'Clean uploads directory',
-			'reset_database'       => 'Reset database',
-			'restore_values'       => 'Restore settings',
-			'reinstall_core'       => 'Reinstall WordPress core',
-			'reinstall_theme'      => 'Reinstall default theme',
-			'restore_nfd_data'     => 'Restore hosting connection',
-			'verify_fresh_install' => 'Verify fresh install state',
-			'restore_session'      => 'Restore session',
-		);
-
-		return isset( $map[ $step_name ] ) ? $map[ $step_name ] : ucwords( str_replace( '_', ' ', $step_name ) );
+		return ResetService::get_step_label( $step_name );
 	}
 }

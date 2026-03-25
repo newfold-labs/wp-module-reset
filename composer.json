@@ -55,7 +55,7 @@
 		],
 		"lint": "vendor/bin/phpcs --standard=phpcs.xml -s .",
 		"fix": "vendor/bin/phpcbf --standard=phpcs.xml .",
-		"i18n-pot": "vendor/bin/wp i18n make-pot . ./languages/wp-module-reset.pot --domain=wp-module-reset --exclude=tests,vendor,node_modules",
+		"i18n-pot": "vendor/bin/wp i18n make-pot . ./languages/wp-module-reset.pot --domain=wp-module-reset --exclude=tests,vendor,node_modules,wordpress",
 		"i18n-po": "vendor/bin/wp i18n update-po ./languages/wp-module-reset.pot ./languages",
 		"i18n-mo": "vendor/bin/wp i18n make-mo ./languages",
 		"i18n-php": "vendor/bin/wp i18n make-php ./languages",
