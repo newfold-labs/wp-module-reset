@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1774467826">
-  <project timestamp="1774467826">
+<coverage generated="1774468156">
+  <project timestamp="1774468156">
     <file name="/home/runner/work/wp-module-reset/wp-module-reset/includes/Admin/ToolsPage.php">
       <class name="NewfoldLabs\WP\Module\Reset\Admin\ToolsPage" namespace="global">
         <metrics complexity="41" methods="10" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="357" coveredstatements="338" elements="367" coveredelements="345"/>
