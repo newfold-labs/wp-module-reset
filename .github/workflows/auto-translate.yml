@@ -22,6 +22,6 @@ jobs:
       pull-requests: write
     uses: newfold-labs/workflows/.github/workflows/reusable-translations.yml@main
     with:
-      text_domain: 'wp-module-next-steps'
+      text_domain: 'wp-module-reset'
     secrets:
       TRANSLATOR_API_KEY: ${{ secrets.TRANSLATOR_API_KEY }}
