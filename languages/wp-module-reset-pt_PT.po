@@ -1,21 +1,21 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: wp-module-reset\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-25T17:27:56+00:00\n"
+"PO-Revision-Date: 2026-03-25T19:48:32+00:00\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese (Portugal)\n"
+"Language: pt_PT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-25T17:27:56+00:00\n"
-"PO-Revision-Date: 2026-03-25T19:45:38+00:00\n"
-"Language: pt_PT\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Domain: wp-module-reset\n"
 "X-Generator: WP-CLI 2.12.0\n"
 
-#: includes/Admin/ToolsPage.php:53
-#: includes/Admin/ToolsPage.php:54
+#: includes/Admin/ToolsPage.php:53 includes/Admin/ToolsPage.php:54
 #: includes/Admin/ToolsPage.php:369
 msgid "Factory Reset Website"
 msgstr "Site de Reset de Fábrica"
@@ -24,20 +24,20 @@ msgstr "Site de Reset de Fábrica"
 msgid "Security check failed. Please try again."
 msgstr "Verificação de segurança falhada. Por favor, tente novamente."
 
-#: includes/Admin/ToolsPage.php:103
-#: includes/Admin/ToolsPage.php:112
+#: includes/Admin/ToolsPage.php:103 includes/Admin/ToolsPage.php:112
 #: includes/Admin/ToolsPage.php:173
 msgid "Error"
 msgstr "Erro"
 
-#: includes/Admin/ToolsPage.php:111
-#: includes/Admin/ToolsPage.php:172
+#: includes/Admin/ToolsPage.php:111 includes/Admin/ToolsPage.php:172
 msgid "You do not have permission to perform this action."
 msgstr "Não tens permissão para realizar esta ação."
 
 #: includes/Admin/ToolsPage.php:123
 msgid "The URL you entered does not match your website URL. Please try again."
-msgstr "O URL que introduziu não corresponde ao URL do seu site. Por favor, tente novamente."
+msgstr ""
+"O URL que introduziu não corresponde ao URL do seu site. Por favor, tente "
+"novamente."
 
 #: includes/Admin/ToolsPage.php:139
 #: includes/Api/Controllers/ResetController.php:100
@@ -46,7 +46,9 @@ msgstr "Falhei em preparar-me para o reset."
 
 #: includes/Admin/ToolsPage.php:183
 msgid "Reset session expired or was not found. Please try again."
-msgstr "A sessão de reinício expirou ou não foi encontrada. Por favor, tente novamente."
+msgstr ""
+"A sessão de reinício expirou ou não foi encontrada. Por favor, tente "
+"novamente."
 
 #: includes/Admin/ToolsPage.php:209
 msgid "You do not have permission to access this page."
@@ -65,8 +67,12 @@ msgid "Performing a factory reset will:"
 msgstr "Realizar um reset de fábrica irá:"
 
 #: includes/Admin/ToolsPage.php:382
-msgid "Delete all database content (posts, pages, comments, settings, custom tables)"
-msgstr "Eliminar todo o conteúdo da base de dados (publicações, páginas, comentários, definições, tabelas personalizadas)"
+msgid ""
+"Delete all database content (posts, pages, comments, settings, custom "
+"tables)"
+msgstr ""
+"Eliminar todo o conteúdo da base de dados (publicações, páginas, "
+"comentários, definições, tabelas personalizadas)"
 
 #. translators: %s: brand plugin name, e.g. "The Bluehost Plugin"
 #: includes/Admin/ToolsPage.php:387
@@ -125,12 +131,18 @@ msgid "Your website has been reset successfully."
 msgstr "O seu site foi reiniciado com sucesso."
 
 #: includes/Admin/ToolsPage.php:643
-msgid "The factory reset is complete. Your site has been restored to a clean state:"
-msgstr "O reset de fábrica está completo. O seu site foi restaurado para um estado limpo:"
+msgid ""
+"The factory reset is complete. Your site has been restored to a clean state:"
+msgstr ""
+"O reset de fábrica está completo. O seu site foi restaurado para um estado "
+"limpo:"
 
 #: includes/Admin/ToolsPage.php:645
-msgid "All database content has been cleared (posts, pages, comments, settings)"
-msgstr "Todo o conteúdo da base de dados foi limpo (publicações, páginas, comentários, definições)"
+msgid ""
+"All database content has been cleared (posts, pages, comments, settings)"
+msgstr ""
+"Todo o conteúdo da base de dados foi limpo (publicações, páginas, "
+"comentários, definições)"
 
 #: includes/Admin/ToolsPage.php:646
 msgid "Third-party plugins and themes have been removed"
@@ -176,19 +188,24 @@ msgstr "O URL de confirmação não corresponde ao URL do seu site."
 
 #: includes/Services/ResetService.php:51
 msgid "Unauthorized. You must be an administrator to perform a factory reset."
-msgstr "Não autorizado. Tens de ser administrador para fazer um reset de fábrica."
+msgstr ""
+"Não autorizado. Tens de ser administrador para fazer um reset de fábrica."
 
 #: includes/Services/ResetService.php:60
 msgid "Factory reset is not supported on WordPress multisite installations."
-msgstr "O reset de fábrica não é suportado em instalações multisite do WordPress."
+msgstr ""
+"O reset de fábrica não é suportado em instalações multisite do WordPress."
 
 #: includes/Services/ResetService.php:76
 msgid "Unable to initialize the WordPress filesystem."
 msgstr "Não é possível inicializar o sistema de ficheiros do WordPress."
 
 #: includes/Services/ResetService.php:139
-msgid "Failed to install the default theme. Reset aborted with no changes made."
-msgstr "Falhou a instalação do tema padrão. O reset foi abortado sem qualquer alteração."
+msgid ""
+"Failed to install the default theme. Reset aborted with no changes made."
+msgstr ""
+"Falhou a instalação do tema padrão. O reset foi abortado sem qualquer "
+"alteração."
 
 #: includes/Services/ResetService.php:152
 msgid "Third-party plugins deactivated."
@@ -240,7 +257,8 @@ msgstr "Tema instalado com sucesso."
 msgid "No third-party plugins to remove."
 msgstr "Não há plugins de terceiros para remover."
 
-#. translators: 1: Number of plugins removed, 2: Total plugin count, 3: Comma-separated list of plugin paths that failed.
+#. translators: 1: Number of plugins removed, 2: Total plugin count, 3: Comma-
+#. separated list of plugin paths that failed.
 #: includes/Services/ResetService.php:530
 #, php-format
 msgid "Removed %1$d of %2$d plugin(s). Failed to remove: %3$s"
@@ -254,7 +272,8 @@ msgid_plural "Removed %d plugins."
 msgstr[0] ""
 msgstr[1] ""
 
-#. translators: 1: Number of themes removed, 2: Total theme count, 3: Semicolon-separated error details.
+#. translators: 1: Number of themes removed, 2: Total theme count, 3:
+#. Semicolon-separated error details.
 #: includes/Services/ResetService.php:587
 #, php-format
 msgid "Removed %1$d of %2$d theme(s). Failed to remove: %3$s"
@@ -318,7 +337,9 @@ msgstr "Reiniciei a base de dados e reinstalei o WordPress."
 
 #: includes/Services/ResetService.php:874
 msgid "Cannot restore values: database reset did not complete."
-msgstr "Não é possível restaurar valores: o reset da base de dados não foi concluído."
+msgstr ""
+"Não é possível restaurar valores: o reset da base de dados não foi "
+"concluído."
 
 #: includes/Services/ResetService.php:902
 msgid "Preserved values restored."
@@ -328,7 +349,8 @@ msgstr "Valores preservados restaurados."
 msgid "No core update offers available."
 msgstr "Não há ofertas de atualização core disponíveis."
 
-#. translators: %s: Semicolon-separated error messages, or a generic unknown error string.
+#. translators: %s: Semicolon-separated error messages, or a generic unknown
+#. error string.
 #: includes/Services/ResetService.php:950
 #, php-format
 msgid "Core reinstall failed: %s"
@@ -366,7 +388,9 @@ msgstr "O ID do posto mais antigo não é 1"
 
 #: includes/Services/ResetService.php:1108
 msgid "Oldest and newest posts have different modification times"
-msgstr "Publicações mais antigas e mais recentes têm tempos de modificação diferentes"
+msgstr ""
+"Publicações mais antigas e mais recentes têm tempos de modificação "
+"diferentes"
 
 #: includes/Services/ResetService.php:1114
 msgid "User with ID 1 does not exist"
