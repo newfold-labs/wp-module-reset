@@ -1,0 +1,8 @@
+{
+    "name": "@newfold-labs/wp-module-reset",
+    "description": "A Newfold module that handles a factory reset of WordPress.",
+    "license": "GPL-2.0-or-later",
+    "private": true,
+    "author": "Chris Miles",
+    "version": "1.0.1"
+}
