@@ -46,14 +46,6 @@
 		}
 	},
 	"scripts": {
-		"test": [
-			"codecept run wpunit"
-		],
-		"test-coverage": [
-			"codecept run wpunit --coverage wpunit.cov",
-			"phpcov merge ./tests/_output/ --clover ./tests/_output/coverage.xml"
-		],
-		"lint": "vendor/bin/phpcs --standard=phpcs.xml -s .",
 		"fix": "vendor/bin/phpcbf --standard=phpcs.xml .",
 		"i18n-pot": "vendor/bin/wp i18n make-pot . ./languages/wp-module-reset.pot --domain=wp-module-reset --exclude=tests,vendor,node_modules,wordpress",
 		"i18n-po": "vendor/bin/wp i18n update-po ./languages/wp-module-reset.pot ./languages",
@@ -64,6 +56,36 @@
 			"@i18n-po",
 			"@i18n-mo",
 			"@i18n-php"
+		],
+		"i18n-ci-pre": [
+			"@i18n-pot",
+			"@i18n-po"
+		],
+		"i18n-ci-post": [
+			"@i18n-po",
+			"@i18n-php",
+			"@i18n-json"
+		],
+		"lint": "vendor/bin/phpcs --standard=phpcs.xml -s .",
+		"test": [
+			"codecept run wpunit"
+		],
+		"test-coverage": [
+			"codecept run wpunit --coverage wpunit.cov",
+			"phpcov merge ./tests/_output/ --clover ./tests/_output/coverage.xml"
 		]
+	},
+	"scripts-descriptions": {
+		"fix": "Automatically fix coding standards issues where possible.",
+		"i18n": "Generate new language files.",
+		"i18n-pot": "Generate a .pot file for translation.",
+		"i18n-po": "Update existing .po files.",
+		"i18n-mo": "Generate new language .mo files.",
+		"i18n-json": "Generate new language .json files.",
+		"i18n-ci-pre": "Command for CI to run before generating language files.",
+		"i18n-ci-post": "Command for CI to run after generating language files.",
+		"lint": "Check files against coding standards.",
+		"test": "Run tests.",
+		"test-coverage": "Run tests with coverage, merge coverage and create HTML report."
 	}
 }
