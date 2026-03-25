@@ -4,7 +4,7 @@ namespace NewfoldLabs\WP\Module\Reset;
 
 // Set Global Constants
 if ( ! defined( 'NFD_RESET_VERSION' ) ) {
-	define( 'NFD_RESET_VERSION', '1.0.1' );
+	define( 'NFD_RESET_VERSION', '1.0.2' );
 }
 if ( ! defined( 'NFD_RESET_DIR' ) ) {
 	define( 'NFD_RESET_DIR', __DIR__ );
