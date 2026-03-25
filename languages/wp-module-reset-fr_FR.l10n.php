@@ -1,0 +1,2 @@
+<?php
+return ['domain'=>'wp-module-reset','plural-forms'=>'nplurals=2; plural=(n > 1);','language'=>'fr_FR','project-id-version'=>'wp-module-reset','pot-creation-date'=>'2026-03-25T17:27:56+00:00','po-revision-date'=>'2026-03-25T17:38:32+00:00','x-generator'=>'WP-CLI 2.12.0','messages'=>[]];
