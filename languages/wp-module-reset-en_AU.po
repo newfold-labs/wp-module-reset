@@ -1,21 +1,21 @@
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: wp-module-reset\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-25T17:27:56+00:00\n"
-"PO-Revision-Date: 2026-03-25T19:24:27+00:00\n"
 "Last-Translator: \n"
 "Language-Team: English (Australia)\n"
-"Language: en_AU\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-03-25T17:27:56+00:00\n"
+"PO-Revision-Date: 2026-03-25T19:45:38+00:00\n"
+"Language: en_AU\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Domain: wp-module-reset\n"
 "X-Generator: WP-CLI 2.12.0\n"
 
-#: includes/Admin/ToolsPage.php:53 includes/Admin/ToolsPage.php:54
+#: includes/Admin/ToolsPage.php:53
+#: includes/Admin/ToolsPage.php:54
 #: includes/Admin/ToolsPage.php:369
 msgid "Factory Reset Website"
 msgstr "Factory Reset Website"
@@ -24,19 +24,20 @@ msgstr "Factory Reset Website"
 msgid "Security check failed. Please try again."
 msgstr "Security check failed. Please try again."
 
-#: includes/Admin/ToolsPage.php:103 includes/Admin/ToolsPage.php:112
+#: includes/Admin/ToolsPage.php:103
+#: includes/Admin/ToolsPage.php:112
 #: includes/Admin/ToolsPage.php:173
 msgid "Error"
 msgstr "Error"
 
-#: includes/Admin/ToolsPage.php:111 includes/Admin/ToolsPage.php:172
+#: includes/Admin/ToolsPage.php:111
+#: includes/Admin/ToolsPage.php:172
 msgid "You do not have permission to perform this action."
 msgstr "You do not have permission to perform this action."
 
 #: includes/Admin/ToolsPage.php:123
 msgid "The URL you entered does not match your website URL. Please try again."
-msgstr ""
-"The URL you entered does not match your website URL. Please try again."
+msgstr "The URL you entered does not match your website URL. Please try again."
 
 #: includes/Admin/ToolsPage.php:139
 #: includes/Api/Controllers/ResetController.php:100
@@ -64,12 +65,8 @@ msgid "Performing a factory reset will:"
 msgstr "Performing a factory reset will:"
 
 #: includes/Admin/ToolsPage.php:382
-msgid ""
-"Delete all database content (posts, pages, comments, settings, custom "
-"tables)"
-msgstr ""
-"Delete all database content (posts, pages, comments, settings, custom "
-"tables)"
+msgid "Delete all database content (posts, pages, comments, settings, custom tables)"
+msgstr "Delete all database content (posts, pages, comments, settings, custom tables)"
 
 #. translators: %s: brand plugin name, e.g. "The Bluehost Plugin"
 #: includes/Admin/ToolsPage.php:387
@@ -128,16 +125,12 @@ msgid "Your website has been reset successfully."
 msgstr "Your website has been reset successfully."
 
 #: includes/Admin/ToolsPage.php:643
-msgid ""
-"The factory reset is complete. Your site has been restored to a clean state:"
-msgstr ""
-"The factory reset is complete. Your site has been restored to a clean state:"
+msgid "The factory reset is complete. Your site has been restored to a clean state:"
+msgstr "The factory reset is complete. Your site has been restored to a clean state:"
 
 #: includes/Admin/ToolsPage.php:645
-msgid ""
-"All database content has been cleared (posts, pages, comments, settings)"
-msgstr ""
-"All database content has been cleared (posts, pages, comments, settings)"
+msgid "All database content has been cleared (posts, pages, comments, settings)"
+msgstr "All database content has been cleared (posts, pages, comments, settings)"
 
 #: includes/Admin/ToolsPage.php:646
 msgid "Third-party plugins and themes have been removed"
@@ -183,8 +176,7 @@ msgstr "The confirmation URL does not match your website URL."
 
 #: includes/Services/ResetService.php:51
 msgid "Unauthorized. You must be an administrator to perform a factory reset."
-msgstr ""
-"Unauthorized. You must be an administrator to perform a factory reset."
+msgstr "Unauthorized. You must be an administrator to perform a factory reset."
 
 #: includes/Services/ResetService.php:60
 msgid "Factory reset is not supported on WordPress multisite installations."
@@ -195,10 +187,8 @@ msgid "Unable to initialize the WordPress filesystem."
 msgstr "Unable to initialize the WordPress filesystem."
 
 #: includes/Services/ResetService.php:139
-msgid ""
-"Failed to install the default theme. Reset aborted with no changes made."
-msgstr ""
-"Failed to install the default theme. Reset aborted with no changes made."
+msgid "Failed to install the default theme. Reset aborted with no changes made."
+msgstr "Failed to install the default theme. Reset aborted with no changes made."
 
 #: includes/Services/ResetService.php:152
 msgid "Third-party plugins deactivated."
@@ -250,8 +240,7 @@ msgstr "Theme installed successfully."
 msgid "No third-party plugins to remove."
 msgstr "No third-party plugins to remove."
 
-#. translators: 1: Number of plugins removed, 2: Total plugin count, 3: Comma-
-#. separated list of plugin paths that failed.
+#. translators: 1: Number of plugins removed, 2: Total plugin count, 3: Comma-separated list of plugin paths that failed.
 #: includes/Services/ResetService.php:530
 #, php-format
 msgid "Removed %1$d of %2$d plugin(s). Failed to remove: %3$s"
@@ -265,8 +254,7 @@ msgid_plural "Removed %d plugins."
 msgstr[0] ""
 msgstr[1] ""
 
-#. translators: 1: Number of themes removed, 2: Total theme count, 3:
-#. Semicolon-separated error details.
+#. translators: 1: Number of themes removed, 2: Total theme count, 3: Semicolon-separated error details.
 #: includes/Services/ResetService.php:587
 #, php-format
 msgid "Removed %1$d of %2$d theme(s). Failed to remove: %3$s"
@@ -340,8 +328,7 @@ msgstr "Preserved values restored."
 msgid "No core update offers available."
 msgstr "No core update offers available."
 
-#. translators: %s: Semicolon-separated error messages, or a generic unknown
-#. error string.
+#. translators: %s: Semicolon-separated error messages, or a generic unknown error string.
 #: includes/Services/ResetService.php:950
 #, php-format
 msgid "Core reinstall failed: %s"
