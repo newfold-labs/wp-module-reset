@@ -1,91 +1,88 @@
 {
-	"name": "newfold-labs/wp-module-reset",
-	"description": "Factory Reset module for Newfold WordPress plugins",
-	"type": "library",
-	"license": "GPL-2.0-or-later",
-	"repositories": {
-		"outlandishideas/wpackagist": {
-			"type": "composer",
-			"url": "https://wpackagist.org"
-		},
-		"0": {
-			"type": "composer",
-			"url": "https://newfold-labs.github.io/satis/",
-			"only": [
-				"newfold-labs/*"
-			]
-		}
-	},
-	"require": {
-		"newfold-labs/wp-module-features": "^1.5"
-	},
-	"require-dev": {
-		"newfold-labs/wp-php-standards": "^1.2.5",
-		"wp-cli/i18n-command": "^2.6.6",
-		"johnpbloch/wordpress": "@stable",
-		"lucatume/wp-browser": "*",
-		"phpunit/phpcov": "*",
-		"yoast/phpunit-polyfills": "^2.0.5"
-	},
-	"autoload": {
-		"psr-4": {
-			"NewfoldLabs\\WP\\Module\\Reset\\": "includes"
-		},
-		"files": [
-			"bootstrap.php"
-		]
-	},
-	"config": {
-		"allow-plugins": {
-			"dealerdirect/phpcodesniffer-composer-installer": true,
-			"composer/installers": true,
-			"johnpbloch/wordpress-core-installer": true
-		},
-		"platform": {
-			"php": "7.4"
-		}
-	},
-	"scripts": {
-		"fix": "vendor/bin/phpcbf --standard=phpcs.xml .",
-		"i18n-pot": "vendor/bin/wp i18n make-pot . ./languages/wp-module-reset.pot --domain=wp-module-reset --exclude=tests,vendor,node_modules,wordpress",
-		"i18n-po": "vendor/bin/wp i18n update-po ./languages/wp-module-reset.pot ./languages",
-		"i18n-mo": "vendor/bin/wp i18n make-mo ./languages",
-		"i18n-php": "vendor/bin/wp i18n make-php ./languages",
-		"i18n": [
-			"@i18n-pot",
-			"@i18n-po",
-			"@i18n-mo",
-			"@i18n-php"
-		],
-		"i18n-ci-pre": [
-			"@i18n-pot",
-			"@i18n-po"
-		],
-		"i18n-ci-post": [
-			"@i18n-po",
-			"@i18n-php",
-			"@i18n-json"
-		],
-		"lint": "vendor/bin/phpcs --standard=phpcs.xml -s .",
-		"test": [
-			"codecept run wpunit"
-		],
-		"test-coverage": [
-			"codecept run wpunit --coverage wpunit.cov",
-			"phpcov merge ./tests/_output/ --clover ./tests/_output/coverage.xml"
-		]
-	},
-	"scripts-descriptions": {
-		"fix": "Automatically fix coding standards issues where possible.",
-		"i18n": "Generate new language files.",
-		"i18n-pot": "Generate a .pot file for translation.",
-		"i18n-po": "Update existing .po files.",
-		"i18n-mo": "Generate new language .mo files.",
-		"i18n-json": "Generate new language .json files.",
-		"i18n-ci-pre": "Command for CI to run before generating language files.",
-		"i18n-ci-post": "Command for CI to run after generating language files.",
-		"lint": "Check files against coding standards.",
-		"test": "Run tests.",
-		"test-coverage": "Run tests with coverage, merge coverage and create HTML report."
-	}
+  "name": "newfold-labs/wp-module-reset",
+  "description": "Factory Reset module for Newfold WordPress plugins",
+  "type": "library",
+  "license": "GPL-2.0-or-later",
+  "repositories": {
+    "outlandishideas/wpackagist": {
+      "type": "composer",
+      "url": "https://wpackagist.org"
+    },
+    "0": {
+      "type": "composer",
+      "url": "https://newfold-labs.github.io/satis/",
+      "only": [
+        "newfold-labs/*"
+      ]
+    }
+  },
+  "require": {
+    "newfold-labs/wp-module-features": "^1.5"
+  },
+  "require-dev": {
+    "newfold-labs/wp-php-standards": "^1.2.5",
+    "wp-cli/i18n-command": "^2.6.6",
+    "johnpbloch/wordpress": "@stable",
+    "lucatume/wp-browser": "*",
+    "phpunit/phpcov": "*",
+    "yoast/phpunit-polyfills": "^2.0.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "NewfoldLabs\\WP\\Module\\Reset\\": "includes"
+    },
+    "files": [
+      "bootstrap.php"
+    ]
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "composer/installers": true,
+      "johnpbloch/wordpress-core-installer": true
+    },
+    "platform": {
+      "php": "7.4"
+    }
+  },
+  "scripts": {
+    "fix": "vendor/bin/phpcbf --standard=phpcs.xml .",
+    "i18n-pot": "vendor/bin/wp i18n make-pot . ./languages/wp-module-reset.pot --domain=wp-module-reset --exclude=tests,vendor,node_modules,wordpress",
+    "i18n-po": "vendor/bin/wp i18n update-po ./languages/wp-module-reset.pot ./languages",
+    "i18n-php": "vendor/bin/wp i18n make-php ./languages --pretty-print",
+    "i18n": [
+      "@i18n-pot",
+      "@i18n-po",
+      "@i18n-php"
+    ],
+    "i18n-ci-pre": [
+      "@i18n-pot",
+      "@i18n-po"
+    ],
+    "i18n-ci-post": [
+      "@i18n-po",
+      "@i18n-php",
+      "@i18n-json"
+    ],
+    "lint": "vendor/bin/phpcs --standard=phpcs.xml -s .",
+    "test": [
+      "codecept run wpunit"
+    ],
+    "test-coverage": [
+      "codecept run wpunit --coverage wpunit.cov",
+      "phpcov merge ./tests/_output/ --clover ./tests/_output/coverage.xml"
+    ]
+  },
+  "scripts-descriptions": {
+    "fix": "Automatically fix coding standards issues where possible.",
+    "i18n-pot": "Scan source and generate the POT translation template using wp i18n make-pot.",
+    "i18n-po": "Update PO files from the POT file using wp i18n update-po.",
+    "i18n-php": "Generate PHP translation files from PO files using wp i18n make-php.",
+    "i18n": "Run the full local i18n pipeline (POT, PO, PHP, JSON).",
+    "i18n-ci-pre": "CI: regenerate the POT file and sync PO catalogs from it.",
+    "i18n-ci-post": "CI: regenerate JED JSON and PHP translation files from PO catalogs.",
+    "lint": "Check files against coding standards.",
+    "test": "Run tests.",
+    "test-coverage": "Run tests with coverage, merge coverage and create HTML report."
+  }
 }
