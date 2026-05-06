@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1774468156">
-  <project timestamp="1774468156">
+<coverage generated="1778102106">
+  <project timestamp="1778102106">
     <file name="/home/runner/work/wp-module-reset/wp-module-reset/includes/Admin/ToolsPage.php">
       <class name="NewfoldLabs\WP\Module\Reset\Admin\ToolsPage" namespace="global">
         <metrics complexity="41" methods="10" coveredmethods="7" conditionals="0" coveredconditionals="0" statements="357" coveredstatements="338" elements="367" coveredelements="345"/>
@@ -511,7 +511,7 @@
     </file>
     <file name="/home/runner/work/wp-module-reset/wp-module-reset/includes/Services/ResetService.php">
       <class name="NewfoldLabs\WP\Module\Reset\Services\ResetService" namespace="global">
-        <metrics complexity="110" methods="20" coveredmethods="9" conditionals="0" coveredconditionals="0" statements="626" coveredstatements="510" elements="646" coveredelements="519"/>
+        <metrics complexity="110" methods="20" coveredmethods="9" conditionals="0" coveredconditionals="0" statements="626" coveredstatements="511" elements="646" coveredelements="520"/>
       </class>
       <line num="36" type="method" name="prepare" visibility="public" complexity="8" crap="8.26" count="18"/>
       <line num="38" type="stmt" count="18"/>
@@ -1085,7 +1085,7 @@
       <line num="1065" type="stmt" count="3"/>
       <line num="1066" type="stmt" count="3"/>
       <line num="1067" type="stmt" count="3"/>
-      <line num="1075" type="method" name="verify_fresh_install" visibility="private" complexity="10" crap="10.17" count="3"/>
+      <line num="1075" type="method" name="verify_fresh_install" visibility="private" complexity="10" crap="10.10" count="3"/>
       <line num="1076" type="stmt" count="3"/>
       <line num="1078" type="stmt" count="3"/>
       <line num="1079" type="stmt" count="3"/>
@@ -1113,7 +1113,7 @@
       <line num="1104" type="stmt" count="3"/>
       <line num="1106" type="stmt" count="3"/>
       <line num="1107" type="stmt" count="2"/>
-      <line num="1108" type="stmt" count="0"/>
+      <line num="1108" type="stmt" count="1"/>
       <line num="1112" type="stmt" count="3"/>
       <line num="1113" type="stmt" count="3"/>
       <line num="1114" type="stmt" count="0"/>
@@ -1159,7 +1159,7 @@
       <line num="1173" type="stmt" count="5"/>
       <line num="1174" type="stmt" count="4"/>
       <line num="1177" type="stmt" count="1"/>
-      <metrics loc="1180" ncloc="915" classes="1" methods="20" coveredmethods="9" conditionals="0" coveredconditionals="0" statements="626" coveredstatements="510" elements="646" coveredelements="519"/>
+      <metrics loc="1180" ncloc="915" classes="1" methods="20" coveredmethods="9" conditionals="0" coveredconditionals="0" statements="626" coveredstatements="511" elements="646" coveredelements="520"/>
     </file>
     <file name="/home/runner/work/wp-module-reset/wp-module-reset/includes/Services/SilentUpgraderSkin.php">
       <class name="NewfoldLabs\WP\Module\Reset\Services\SilentUpgraderSkin" namespace="global">
@@ -1179,6 +1179,6 @@
       <line num="52" type="stmt" count="2"/>
       <metrics loc="56" ncloc="31" classes="1" methods="2" coveredmethods="2" conditionals="0" coveredconditionals="0" statements="10" coveredstatements="10" elements="12" coveredelements="12"/>
     </file>
-    <metrics files="9" loc="2286" ncloc="1770" classes="9" methods="49" coveredmethods="33" conditionals="0" coveredconditionals="0" statements="1075" coveredstatements="935" elements="1124" coveredelements="968"/>
+    <metrics files="9" loc="2286" ncloc="1770" classes="9" methods="49" coveredmethods="33" conditionals="0" coveredconditionals="0" statements="1075" coveredstatements="936" elements="1124" coveredelements="969"/>
   </project>
 </coverage>
