@@ -23,6 +23,7 @@ jobs:
     permissions:
       contents: write      # Required for the reusable workflow to commit translation updates and push branches.
       pull-requests: write # Required for the reusable workflow to open or update translation pull requests.
+    timeout-minutes: 30
     with:
       text_domain: 'wp-module-reset'
     secrets:

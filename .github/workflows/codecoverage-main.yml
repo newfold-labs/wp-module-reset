@@ -16,6 +16,7 @@ permissions: {}
 jobs:
   get-repo-name:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions: {} # No checkout; only reads github.repository from the workflow context.
     outputs:
       repository-name: ${{ steps.repo-name.outputs.name }}
@@ -26,6 +27,7 @@ jobs:
 
   codecoverage:
     needs: get-repo-name
+    timeout-minutes: 30
     permissions:
       contents: write      # Required for the reusable workflow to push coverage HTML to gh-pages.
       pull-requests: write # Required for the reusable workflow to add coverage comments on pull requests.
