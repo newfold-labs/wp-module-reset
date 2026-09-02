@@ -60,9 +60,7 @@
       "@i18n-po"
     ],
     "i18n-ci-post": [
-      "@i18n-po",
-      "@i18n-php",
-      "@i18n-json"
+      "@i18n-php"
     ],
     "lint": "vendor/bin/phpcs --standard=phpcs.xml -s .",
     "test": [
@@ -80,7 +78,7 @@
     "i18n-php": "Generate PHP translation files from PO files using wp i18n make-php.",
     "i18n": "Run the full local i18n pipeline (POT, PO, PHP, JSON).",
     "i18n-ci-pre": "CI: regenerate the POT file and sync PO catalogs from it.",
-    "i18n-ci-post": "CI: regenerate JED JSON and PHP translation files from PO catalogs.",
+    "i18n-ci-post": "CI: regenerate PHP translation files from PO catalogs.",
     "lint": "Check files against coding standards.",
     "test": "Run tests.",
     "test-coverage": "Run tests with coverage, merge coverage and create HTML report."
