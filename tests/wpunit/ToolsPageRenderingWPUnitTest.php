@@ -32,7 +32,7 @@ class ToolsPageRenderingWPUnitTest extends WPTestCase {
 		$this->tools_page = new ToolsPage();
 
 		// Clean up superglobals between tests.
-		unset( $_GET['page'], $_GET['nfd_reset_phase'], $_GET['reset_complete'] );
+		unset( $_GET['page'], $_GET['nfd_reset_phase'], $_GET['reset_complete'], $_GET['_wpnonce'] );
 		unset( $_POST[ ToolsPage::NONCE_NAME ], $_POST['confirmation_url'] );
 	}
 
@@ -41,7 +41,7 @@ class ToolsPageRenderingWPUnitTest extends WPTestCase {
 		delete_transient( 'nfd_reset_result' );
 		delete_transient( 'nfd_reset_phase2' );
 
-		unset( $_GET['page'], $_GET['nfd_reset_phase'], $_GET['reset_complete'] );
+		unset( $_GET['page'], $_GET['nfd_reset_phase'], $_GET['reset_complete'], $_GET['_wpnonce'] );
 		unset( $_POST[ ToolsPage::NONCE_NAME ], $_POST['confirmation_url'] );
 
 		parent::tearDown();
@@ -166,6 +166,7 @@ class ToolsPageRenderingWPUnitTest extends WPTestCase {
 
 		$_GET['page']            = ToolsPage::get_slug();
 		$_GET['nfd_reset_phase'] = '2';
+		$_GET['_wpnonce']        = wp_create_nonce( ToolsPage::NONCE_PHASE2_ACTION );
 
 		// No transient set — should set error and redirect.
 		// Catch the redirect to prevent exit.
@@ -188,6 +189,50 @@ class ToolsPageRenderingWPUnitTest extends WPTestCase {
 		$this->assertNotFalse( $error, 'Error transient should be set when phase2 data is missing.' );
 		$this->assertStringContainsString( 'expired', $error );
 		$this->assertNotNull( $redirect_url, 'Should redirect back to the form page.' );
+	}
+
+	public function test_phase2_rejects_invalid_nonce() {
+		wp_set_current_user( $this->admin_id );
+
+		$_GET['page']            = ToolsPage::get_slug();
+		$_GET['nfd_reset_phase'] = '2';
+		$_GET['_wpnonce']        = 'invalid-nonce-value';
+
+		// Prime phase 2 data so, without the nonce guard, the reset would run.
+		set_transient(
+			'nfd_reset_phase2',
+			array(
+				'data'  => array( 'brand_basename' => 'x/x.php' ),
+				'steps' => array(),
+			),
+			300
+		);
+
+		$redirect_url = null;
+		add_filter(
+			'wp_redirect',
+			function ( $location ) use ( &$redirect_url ) {
+				$redirect_url = $location;
+				throw new \Exception( 'redirect_caught' );
+			}
+		);
+
+		try {
+			$this->tools_page->handle_submission();
+		} catch ( \Exception $e ) {
+			// Expected — redirect short-circuits execution.
+		}
+
+		$error = get_transient( 'nfd_reset_error' );
+		$this->assertNotFalse( $error, 'Invalid phase 2 nonce should set an error transient.' );
+		$this->assertStringContainsString( 'Security check', $error );
+		$this->assertNotNull( $redirect_url, 'Invalid nonce should redirect back to the form.' );
+
+		// The reset must not have run: phase 2 data is untouched (not consumed).
+		$this->assertNotFalse(
+			get_transient( 'nfd_reset_phase2' ),
+			'Phase 2 data should remain when the nonce is rejected.'
+		);
 	}
 
 	// ------------------------------------------------------------------

@@ -21,6 +21,7 @@ Full route pattern: `POST /wp-json/{namespace}/factory-reset`
 
 - User must be logged in with **`manage_options`**.
 - Use a **REST nonce** (`X-WP-Nonce`) or cookie authentication as for other WordPress REST endpoints.
+- The endpoint does not accept **application-password** authentication; such a request receives `403`.
 
 ## Request body (JSON)
 

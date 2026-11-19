@@ -148,7 +148,7 @@ After completion:
 |------|--------|
 | **Session** | Still logged in as the same admin; password unchanged |
 | **Plugins** | Only the brand plugin remains active |
-| **Themes** | Only the brand default theme (e.g. `bluehost-blueprint` for Bluehost) remains |
+| **Themes** | Immediately after the reset, only the default theme (WordPress core's own `WP_DEFAULT_THEME` for the running version, e.g. `twentytwentyfive` on WP 6.7+) remains; onboarding re-runs afterward and may install a brand theme |
 | **Content** | Fresh default post/page; prior content gone |
 | **Settings** | Site title and URLs match pre-reset where preserved |
 | **Front end** | Loads |

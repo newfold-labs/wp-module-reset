@@ -17,7 +17,8 @@ updated: 2025-03-25
 
 **`BrandConfig`** reads the host plugin from the loader **container** (`container()->plugin()`):
 
-- **Brand ID** – default theme slug, tools page slug (`{id}-factory-reset-website`), REST namespace (`{id}/v1`).
+- **Brand ID** – tools page slug (`{id}-factory-reset-website`), REST namespace (`{id}/v1`).
+- **Default theme** – WordPress core's own default theme for the running version (the `WP_DEFAULT_THEME` constant), the same for every brand. A factory reset returns the site to stock WordPress; re-applying a brand theme is onboarding's job, not the reset's. Using the core constant keeps the reset working on any WordPress version (the theme is always bundled and version-compatible) instead of a fixed slug that could require a newer core than the site runs.
 - **Brand plugin** – basename preserved during reset; only that plugin stays active after Phase 1 deactivation.
 
 If the container is unavailable (e.g. some test contexts), defaults fall back toward **bluehost**-compatible values where implemented.

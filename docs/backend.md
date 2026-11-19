@@ -33,6 +33,6 @@ updated: 2025-03-25
 
 ## Data and security
 
-**`includes/Data/BrandConfig.php`** – Brand ID, plugin basename/name, default theme slug, page slug, REST namespace.
+**`includes/Data/BrandConfig.php`** – Brand ID, plugin basename/name, page slug, REST namespace, and the brand-agnostic default theme slug (WordPress core's own `WP_DEFAULT_THEME` for the running version).
 
 **`includes/Permissions.php`** – `manage_options` checks for admin and REST permission callback.

@@ -62,6 +62,17 @@ class ResetController extends \WP_REST_Controller {
 			);
 		}
 
+		// Factory reset is a destructive operation. Do not run it for a request
+		// authenticated with a WordPress application password, even for an
+		// administrator.
+		if ( Permissions::is_application_password_auth() ) {
+			return new \WP_Error(
+				'rest_forbidden',
+				__( 'A factory reset cannot be performed using an application password. Sign in to the WordPress admin to run it.', 'wp-module-reset' ),
+				array( 'status' => 403 )
+			);
+		}
+
 		return true;
 	}
 
