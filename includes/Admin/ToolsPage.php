@@ -28,6 +28,13 @@ class ToolsPage {
 	const NONCE_NAME = 'nfd_factory_reset_nonce';
 
 	/**
+	 * Nonce action for the Phase 1 -> Phase 2 handoff.
+	 *
+	 * @var string
+	 */
+	const NONCE_PHASE2_ACTION = 'nfd_factory_reset_phase2';
+
+	/**
 	 * Get the page slug (computed at runtime from the brand ID).
 	 *
 	 * @return string
@@ -154,7 +161,17 @@ class ToolsPage {
 		// Raw header redirect — NOT wp_safe_redirect() — because third-party
 		// plugins may still have hooks on allowed_redirect_hosts that would
 		// fatal now that their files might be partially cleaned up.
-		$phase2_url = admin_url( 'admin.php?page=' . self::get_slug() . '&nfd_reset_phase=2' );
+		//
+		// Build the URL with add_query_arg (not wp_nonce_url, which returns an
+		// esc_html'd URL with encoded ampersands that a raw Location header
+		// would mishandle). Phase 2 verifies this nonce before acting.
+		$phase2_url = esc_url_raw(
+			add_query_arg(
+				'_wpnonce',
+				wp_create_nonce( self::NONCE_PHASE2_ACTION ),
+				admin_url( 'admin.php?page=' . self::get_slug() . '&nfd_reset_phase=2' )
+			)
+		);
 		header( 'Location: ' . $phase2_url, true, 302 );
 		exit;
 	}
@@ -173,6 +190,14 @@ class ToolsPage {
 				esc_html__( 'Error', 'wp-module-reset' ),
 				array( 'response' => 403 )
 			);
+		}
+
+		// Verify the nonce issued by Phase 1 before doing anything.
+		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, self::NONCE_PHASE2_ACTION ) ) {
+			set_transient( 'nfd_reset_error', __( 'Security check failed. Please try again.', 'wp-module-reset' ), 60 );
+			wp_safe_redirect( admin_url( 'admin.php?page=' . self::get_slug() ) );
+			exit;
 		}
 
 		// Retrieve Phase 1 data.

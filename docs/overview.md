@@ -12,8 +12,8 @@ updated: 2025-03-25
 ## Capabilities
 
 - **Admin UI** – Submenu under **Tools → Factory Reset Website** (slug and copy are brand-aware via `BrandConfig`). The user must type the site URL to confirm; reset runs in **two HTTP phases** (prepare with plugins loaded, then execute with only the brand plugin active) when using the form.
-- **REST API** – `POST` to `{brand}/v1/factory-reset` with `confirmation_url` for clients that integrate programmatically (single request: prepare + execute).
-- **Safety rails** – Refuses multisite; requires `manage_options`; installs target default theme before destructive steps; suppresses email and hardens the environment during execution.
+- **REST API** – `POST` to `{brand}/v1/factory-reset` with `confirmation_url` for clients that integrate programmatically (single request: prepare + execute). The route requires an admin session and does not accept application-password authentication.
+- **Safety rails** – Refuses multisite; requires `manage_options`; installs the default theme (WordPress core's own `WP_DEFAULT_THEME` for the running version, brand-agnostic) before destructive steps; suppresses email and hardens the environment during execution.
 
 ## Who maintains it
 

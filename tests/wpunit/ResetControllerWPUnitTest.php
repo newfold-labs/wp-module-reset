@@ -88,6 +88,35 @@ class ResetControllerWPUnitTest extends WPTestCase {
 		$this->assertTrue( $result );
 	}
 
+	public function test_permission_callback_rejects_application_password_auth() {
+		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $user_id );
+
+		// Simulate that this request authenticated via an application password
+		// (core fires this action during determine_current_user). Save and
+		// restore the global action counter so random test order cannot leak
+		// this state into other tests.
+		global $wp_actions;
+		$previous = isset( $wp_actions['application_password_did_authenticate'] )
+			? $wp_actions['application_password_did_authenticate']
+			: null;
+		$wp_actions['application_password_did_authenticate'] = 1;
+
+		try {
+			$result = $this->controller->check_permission();
+		} finally {
+			if ( null === $previous ) {
+				unset( $wp_actions['application_password_did_authenticate'] );
+			} else {
+				$wp_actions['application_password_did_authenticate'] = $previous;
+			}
+		}
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 'rest_forbidden', $result->get_error_code() );
+		$this->assertSame( 403, $result->get_error_data()['status'] );
+	}
+
 	public function test_url_validation_mismatched_url_returns_error() {
 		$user_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $user_id );
